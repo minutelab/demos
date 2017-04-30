@@ -1,0 +1,41 @@
+#!/usr/bin/env mlab
+
+FROM ubuntu
+
+FLAG ver=2.7.3 "hadoop version"
+FLAG nslaves=2 "number of slaves"
+
+NETDEF 192.168.200.0/25 -default
+SET master=192.168.200.10
+
+RUN << END
+    apt-get update
+    apt-get install -y curl openssh-client net-tools vim less
+END
+
+
+SET GOHDFS=1.0.3
+RUN << END
+   cd /tmp
+   curl -L https://github.com/colinmarc/hdfs/releases/download/v$GOHDFS/gohdfs-v$GOHDFS-linux-amd64.tar.gz | tar -zxv
+   mv gohdfs-v$GOHDFS-linux-amd64/hdfs /usr/local/bin
+   rm -rf gohdfs*
+END
+EXPORT HADOOP_NAMENODE=$master:9000
+
+ADD $spath/*.mlab $spath/*.sh /usr/local/bin
+RUN chmod +x /usr/local/bin/*.mlab /usr/local/bin/*.sh
+
+ADD *.xml /tmp
+WORKDIR /tmp
+
+EXPOSE 50070 50070
+EXPOSE 8088 8088
+
+# TODO: temp
+SHARE /src .
+
+START << END
+    setup.sh $master $nslaves
+    bash
+END

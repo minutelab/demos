@@ -1,0 +1,36 @@
+#!/usr/bin/env mlab
+
+FROM ubuntu
+
+FLAG ver=2.7.3 "hadoop version"
+FLAG nslaves=2 "number of slaves"
+FLAG datavolume "volume containing the data"
+FLAG master "IP of the master"
+FLAG hostdir "Directory to put (share) host file"
+
+HOSTNAME hadoop-clusetr
+
+RUN << END
+    apt-get update
+    apt-get install -y curl openssh-client net-tools vim less
+END
+
+ADD $spath/*.mlab $spath/*.sh /usr/local/bin
+RUN chmod +x /usr/local/bin/*.mlab /usr/local/bin/*.sh
+
+ADD $spath/*.xml /tmp
+WORKDIR /tmp
+
+EXPOSE 50070 50070
+EXPOSE 8088 8088
+
+SHARE /tmp/data $datavolume
+SHARE /tmp/hostdir $hostdir
+
+START << END
+    set -x
+    setup.sh -m "$master" -n $nslaves -v $ver
+    cp hosts /tmp/hostdir
+    mlab detach
+    sleep 7d
+END

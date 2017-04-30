@@ -1,0 +1,84 @@
+#!/usr/bin/env mlab
+
+FROM java:7
+
+IMPORT HOSTS
+
+FLAG ver=2.7.3        "hadoop version"
+FLAG name="client"    "node name"
+FLAG ip               "node IP (mandatory)"
+FLAG datadir          "Directory for mounting data"
+FLAG replication=2    "number of replications for hdfs"
+FLAG keys             "directory with ssh keys"
+FLAG hosts=$HOSTS     "additional host file"
+FLAG masterkey        "master public ssh key"
+FLAG slaves           "list of slaves"
+FLAG knownhosts       "kown_hosts file (with all slaves)"
+FLAG hdfsweb=0        "port for hdfs web management"
+FLAG yarnweb=0        "port for yarn web management"
+
+NETCON $ip
+
+HOSTNAME $name
+
+SHARE /mnt/hdfs $datadir
+
+SET MIRROR=http://apache.claz.org/hadoop/common/
+
+# install ssh daemon (for hdfs), and make sure that root has it in its known keys
+RUN << END
+    apt-get update
+    apt-get install -y openssh-server
+    # disable all keys but rsa
+    sed -i -e 's/^HostKey/#HostKey/' -e 's/^#\(HostKey.*rsa_key.*\)/\1/' /etc/ssh/sshd_config
+END
+
+# install some common utilities
+RUN << END
+    apt-get install -y net-tools vim less
+END
+
+# Install hadoop
+RUN << END
+    cd /tmp
+    curl -s $MIRROR/hadoop-$ver/hadoop-$ver.tar.gz | tar -xz -C /usr/local/
+    cd /usr/local && ln -s ./hadoop-$ver hadoop
+END
+
+RUN sed  -i -e "s#^export JAVA_HOME=.*#export JAVA_HOME=${JAVA_HOME}#" /usr/local/hadoop/etc/hadoop/hadoop-env.sh
+
+EXPORT HADOOP_CONF_DIR=/usr/local/hadoop/etc/hadoop
+EXPORT PATH=$PATH:/usr/local/hadoop/sbin:/usr/local/hadoop/bin
+
+ADD *.xml $HADOOP_CONF_DIR/
+ADD $spath/start.sh /usr/local/bin
+
+INSERT $HADOOP_CONF_DIR/hdfs-site.xml << END
+<configuration>
+    <property>
+        <name>dfs.replication</name>
+        <value>$replication</value>
+    </property>
+    <property>
+        <name>dfs.datanode.data.dir</name>
+        <value>/mnt/hdfs/data</value>
+    </property>
+    <property>
+        <name>dfs.namenode.name.dir</name>
+        <value>/mnt/hdfs/name</value>
+    </property>
+</configuration>
+END
+
+ADD -ifexist $keys/ssh_host_rsa_key* /etc/ssh
+
+ADD -ifexist $hosts /tmp/hosts
+ADD -ifexist $masterkey /root/.ssh/master.pub
+ADD -ifexist $knownhosts /root/.ssh/known_hosts
+
+EXPOSE 50070 $hdfsweb
+EXPOSE  8088 $yarnweb
+
+ADD $spath/start.sh /usr/local/bin
+
+START start.sh -n "$name" -s "$slaves"

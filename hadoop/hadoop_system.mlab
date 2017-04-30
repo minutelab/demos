@@ -1,0 +1,30 @@
+#!/usr/bin/env mlab
+
+FROM ubuntu
+
+FLAG ver=2.7.3 "hadoop version"
+FLAG nslaves=2 "number of slaves"
+FLAG datavolume "if not empty use persistant data in this volume"
+
+NETDEF 192.168.200.0/25 -default
+SET master=192.168.200.10
+
+ADD $spath/*.xml $spath/*.mlab $spath/*.sh /src
+
+SHARE /tmp/hosts
+
+WORKDIR /src
+
+EXPOSE 50070 50070
+EXPOSE 8088 8088
+
+START << END
+    if [ -n "$datavolume" ]
+    then
+      volume="-datavolume VOLUME:$datavolume"
+    fi
+
+    ./hadoop_cluster.mlab -ver $ver -nslaves $nslaves -master $master \$volume -hostdir /tmp/hosts
+    export HOSTS=/tmp/hosts/hosts
+    ./hadoop.mlab -ver $ver
+END
