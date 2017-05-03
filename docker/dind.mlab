@@ -1,0 +1,22 @@
+#!/usr/bin/env mlab
+
+FROM docker:$ver
+
+FLAG ver=dind "docker in docker version to use"
+FLAG dockerdb "directory (or volume) containing the docker image db"
+FLAG address  "IP address to take"
+
+OPTION privileged
+
+EXPOSE 2735
+
+NETCON $address
+
+SHARE /var/lib/docker $dockerdb
+
+BACKGROUND mlab detach -p :2375 -t 30s
+
+START << END
+  set -x
+  /usr/local/bin/dockerd-entrypoint.sh dockerd -H tcp://$address:2375 --storage-driver=aufs
+END

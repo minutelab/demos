@@ -1,0 +1,19 @@
+#!/usr/bin/env mlab
+
+FROM ubuntu
+
+FLAG volume=dockerdb  "volume containing the docker image db"
+
+NETDEF 192.168.200.0/25 -default
+
+SET DOCKER=192.168.200.10
+
+ADD $spath/*.mlab /usr/local/bin
+RUN chmod +x /usr/local/bin/*mlab
+
+SHARE /dockerdb VOLUME:$volume
+
+START << end
+    dind.mlab -dockerdb /dockerdb -address $DOCKER
+    dockerc.mlab -host $DOCKER  
+end

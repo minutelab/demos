@@ -1,0 +1,21 @@
+#!/usr/bin/env mlab
+
+FROM ubuntu
+
+FLAG version=17.03.1-ce "Docker version"
+FLAG host "Docker Host"
+
+RUN apt-get update && apt-get install -y vim wget
+
+RUN << end
+  cd /tmp
+  wget https://get.docker.com/builds/Linux/x86_64/docker-$version.tgz
+  tar -zxvf docker-$version.tgz
+  mv docker/docker /usr/local/bin
+  mv docker/completion/bash/docker /etc/
+  rm -rf docker
+end
+
+EXPORT DOCKER_HOST=$host
+
+START bash

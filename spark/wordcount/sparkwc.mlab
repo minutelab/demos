@@ -1,0 +1,46 @@
+#!/usr/bin/env mlab
+
+FROM singularities/spark:$ver
+
+FLAG ver=2.1 "spark version"
+
+NETDEF 192.168.200.0/25 -default
+SET MASTERADDR=192.168.200.10
+
+EXPOSE 7077
+EXPOSE 8080
+EXPOSE 6066
+
+RUN curl http://www.gutenberg.org/files/2600/2600-0.txt > /root/warandpeace.txt
+
+ADD $spath/../cluster/*.mlab /usr/local/bin/
+
+ADD $spath/count.py /root/
+
+EXPORT HADOOP_USER_NAME=spark
+EXPORT SPARK_VER=$ver
+EXPORT MASTERADDR=$MASTERADDR
+
+INSERT /tmp/core-site.xml << CONF
+<configuration>
+  <property>
+    <name>fs.defaultFS</name>
+    <value>hdfs://$MASTERADDR:8020</value>
+  </property>
+</configuration>
+CONF
+
+WORKDIR /root
+
+START << END
+  ls -l /usr/local/bin/*.mlab
+  spark.mlab -ver $ver -ip $MASTERADDR
+
+  cp /tmp/core-site.xml \$HADOOP_CONF_DIR/core-site.xml
+  hadoop fs -mkdir -p /user/$HADOOP_USER_NAME
+  hadoop fs -put warandpeace.txt
+
+  spark-submit --master spark://$MASTERADDR:7077 count.py warandpeace.txt
+
+  bash
+END

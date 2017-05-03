@@ -1,0 +1,16 @@
+#!/usr/bin/env mlab
+
+FLAG ver=2.1 "spark version"
+FLAG ip=default "Main IP"
+
+FROM singularities/spark:$ver
+
+NETCON $ip
+
+EXPOSE 7077
+EXPOSE 8080
+EXPOSE 6066
+
+BACKGROUND mlab detach -p :7077 -t 60s
+
+START start-spark master

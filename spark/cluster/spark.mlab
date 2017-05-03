@@ -1,0 +1,23 @@
+#!/usr/bin/env mlab
+
+FROM ubuntu
+
+FLAG ver=2.1 "spark version"
+FLAG ip=default "spark master address"
+
+EXPOSE 7077
+EXPOSE 8080
+EXPOSE 6066
+
+ADD $spath/spark*.mlab /usr/local/bin/
+RUN chmod +x /usr/local/bin/*.mlab
+
+START << END
+  spark_master.mlab -ver $ver -ip $ip
+  spark_worker.mlab -ver $ver -master $ip
+  spark_worker.mlab -ver $ver -master $ip
+
+  echo "Cluster is Ready"
+  mlab detach
+  sleep 30d
+END

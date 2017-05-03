@@ -1,0 +1,12 @@
+#!/usr/bin/env mlab
+
+FLAG ver=2.1 "spark version"
+FLAG master "Master IP"
+
+FROM singularities/spark:$ver
+
+BACKGROUND mlab detach -p :8081 -t 60s
+
+EXPORT MASTER=$master
+
+START start-spark worker $MASTER
