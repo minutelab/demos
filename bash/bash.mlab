@@ -1,0 +1,15 @@
+#!/usr/bin/env mlab
+
+FLAG os=ubuntu "os type and version (currently only debian/ubuntu)"
+
+FROM $os
+
+RUN apt-get update && apt-get install -y vim
+
+IMPORT HOME
+SET history=$HOME/.mlab_bash_history
+
+ADD -ifexist $history /root/.bash_history
+OUTPUT /root/.bash_history $history
+
+START bash
