@@ -1,0 +1,30 @@
+#!/usr/bin/env mlab
+
+FROM ubuntu
+
+FLAG version=0.10.2.0
+FLAG zookeeper "zookeeper IP"
+FLAG nodes=2 "Number of nodes"
+FLAG datadir "directory for data (for all members)"
+
+SHARE /data $datadir
+
+ADD $spath/kafkanode.mlab /usr/local/bin
+
+START << END
+  if [ -z "$zookeeper" ]
+  then
+    echo "No zookeeper"
+    exit 1
+  fi
+
+  for n in `seq 1 $nodes`
+  do
+    dir=/data/broker-\$n
+    mkdir -p \$dir/data
+    mkdir -p \$dir/log
+    kafkanode.mlab -version $version -zookeeper $zookeeper -id \$n -datadir \$dir/data -logdir \$dir/log
+  done
+  mlab detach
+  sleep 3d
+END

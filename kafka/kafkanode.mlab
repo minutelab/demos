@@ -1,0 +1,23 @@
+#!/usr/bin/env mlab
+
+FROM ches/kafka:$version
+
+FLAG version=0.10.2.0
+FLAG zookeeper "zookeeper IP"
+FLAG id "ID of kafka broker"
+FLAG datadir "directory for data"
+FLAG logdir "directory for data"
+
+NAME broker-$id
+
+USER root
+
+EXPORT ZOOKEEPER_IP=$zookeeper
+EXPORT KAFKA_BROKER_ID=$id
+
+SHARE /log $logdir
+SHARE /data $datadir
+
+BACKGROUND mlab detach -p :9092 -t 60s
+
+START /start.sh

@@ -1,0 +1,49 @@
+#!/usr/bin/env mlab
+
+FLAG port=8081
+FLAG hosts=hosts
+FLAG data="VOLUME:zeppelin" "directory or volume to permanently store data"
+FLAG version=0.7.1 "Zeppelin version"
+FLAG sparkver=2.1.0 "spark version"
+FLAG hadoopver=2.7 "hadoop version"
+
+FROM java:8
+
+RUN << END
+  cd /usr/local
+  curl -s http://d3kbcqa49mib13.cloudfront.net/spark-$sparkver-bin-hadoop$hadoopver.tgz | tar -xz
+  ln -s spark-$sparkver-bin-hadoop$hadoopver spark
+END
+
+RUN << END
+  cd /usr/local
+  curl -s http://www-us.apache.org/dist/zeppelin/zeppelin-$version/zeppelin-$version-bin-all.tgz | tar -xz
+  ln -s zeppelin-$version-bin-all zeppelin
+END
+
+EXPORT SPARK_HOME=/usr/local/spark
+
+ADD -ifexist $hosts /tmp/hosts
+
+SHARE /mnt/data $data
+
+EXPOSE 8080 $port
+
+START <<END
+  [ -e /tmp/hosts ] && cat /tmp/hosts >> /etc/hosts
+
+  cd /usr/local/zeppelin
+
+  if [ ! -d /mnt/data/notebook ]
+  then
+    rm -rf /mnt/data/*
+    cp -R notebook conf /mnt/data
+  fi
+
+  rm -rf notebook conf
+  ln -s /mnt/data/notebook .
+  ln -s /mnt/data/conf .
+
+  bin/zeppelin-daemon.sh start
+  bash
+END

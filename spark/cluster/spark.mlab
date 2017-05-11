@@ -4,20 +4,43 @@ FROM ubuntu
 
 FLAG ver=2.1 "spark version"
 FLAG ip=default "spark master address"
+FLAG suffix="-spark" "suffix for container names"
+FLAG hosts=hosts "file to write hosts file"
+FLAG datadir "directory/volume to store the data"
+FLAG workers=2 "number of workers"
 
-EXPOSE 7077
+NAME cluster$suffix
+
+#EXPOSE 7077
 EXPOSE 8080
-EXPOSE 6066
+#EXPOSE 6066
 
-ADD $spath/spark*.mlab /usr/local/bin/
-RUN chmod +x /usr/local/bin/*.mlab
+ADD $spath/spark*.mlab /src
+ADD $spath/conf/*.xml /src/conf
+
+WORKDIR /src
+
+OUTPUT /tmp/hosts $hosts
+SHARE /mnt/data $datadir
 
 START << END
-  spark_master.mlab -ver $ver -ip $ip
-  spark_worker.mlab -ver $ver -master $ip
-  spark_worker.mlab -ver $ver -master $ip
+  master=master$suffix
+
+  mkdir -p /mnt/data/master
+  ./spark_master.mlab -ver $ver -ip $ip -hosts /tmp/hosts -name \$master -datadir /mnt/data/master
+  masterip=`grep \$master /tmp/hosts | cut -f 1`
+  echo "Spark master: \$master - \$masterip"
+
+  for n in `seq 1 $workers`
+  do
+    echo "starting node \$n"
+    dir=/mnt/data/node\$n
+    mkdir -p \$dir
+    ./spark_worker.mlab -ver $ver -master \$masterip -hosts /tmp/node -name node\$n$suffix -mname \$master -datadir \$dir
+    cat /tmp/node >> /tmp/hosts
+  done
 
   echo "Cluster is Ready"
-  mlab detach
+  mlab detach --collect
   sleep 30d
 END

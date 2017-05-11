@@ -2,45 +2,44 @@
 
 FROM singularities/spark:$ver
 
+FLAG hosts=hosts "hosts files containing names of cluster members"
+FLAG master=master-spark "IP or name of spark master"
 FLAG ver=2.1 "spark version"
-
-NETDEF 192.168.200.0/25 -default
-SET MASTERADDR=192.168.200.10
-
-EXPOSE 7077
-EXPOSE 8080
-EXPOSE 6066
 
 RUN curl http://www.gutenberg.org/files/2600/2600-0.txt > /root/warandpeace.txt
 
-ADD $spath/../cluster/*.mlab /usr/local/bin/
+ADD $spath/count.py /root
 
 ADD $spath/count.py /root/
 
 EXPORT HADOOP_USER_NAME=spark
 EXPORT SPARK_VER=$ver
-EXPORT MASTERADDR=$MASTERADDR
+EXPORT MASTERADDR=$master
+
+ADD -ifexist $hosts /tmp/hosts
 
 INSERT /tmp/core-site.xml << CONF
 <configuration>
   <property>
     <name>fs.defaultFS</name>
-    <value>hdfs://$MASTERADDR:8020</value>
+    <value>hdfs://$master:8020</value>
   </property>
 </configuration>
 CONF
 
 WORKDIR /root
 
+OUTPUT /root/count count
+
 START << END
-  ls -l /usr/local/bin/*.mlab
-  spark.mlab -ver $ver -ip $MASTERADDR
-
+  [ -e /tmp/hosts ] && cat /tmp/hosts >> /etc/hosts
   cp /tmp/core-site.xml \$HADOOP_CONF_DIR/core-site.xml
+
+  echo "Uploading file to hdfs"
+
   hadoop fs -mkdir -p /user/$HADOOP_USER_NAME
-  hadoop fs -put warandpeace.txt
+  hadoop fs -put -f warandpeace.txt
 
-  spark-submit --master spark://$MASTERADDR:7077 count.py warandpeace.txt
-
-  bash
+  echo "Starting"
+  spark-submit --master spark://$master:7077 count.py warandpeace.txt | tee count
 END

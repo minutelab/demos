@@ -1,0 +1,15 @@
+#!/usr/bin/env mlab
+
+FLAG version=3.4 "zookeeper version"
+FLAG ip "IP for the first zookeeper"
+FLAG nodes=3 "number of nodes"
+
+FROM ubuntu
+
+ADD $spath/zoonode.mlab $spath/startcluster.sh /usr/local/bin
+
+START << END
+   startcluster.sh -n $nodes -v $version $ip
+   mlab detach
+   sleep 3d
+END

@@ -1,0 +1,46 @@
+#!/usr/bin/env mlab
+
+FLAG version=cdh5.11.0
+FLAG port=8000
+FLAG hdfs "address of hdfs name node"
+FLAG hosts hosts "hosts file"
+
+FROM ubuntu
+
+RUN << END
+  apt-get update
+  apt-get install -y ant gcc g++ libkrb5-dev libmysqlclient-dev libssl-dev \
+                     libsasl2-dev libsasl2-modules-gssapi-mit libsqlite3-dev \
+                     libtidy-0.99-0 libxml2-dev libxslt-dev make libldap2-dev maven \
+                     python-dev python-setuptools libgmp3-dev git vim curl openjdk-8-jdk
+END
+
+RUN << END
+  mkdir /src
+  cd /src
+  curl -L  https://github.com/cloudera/hue/archive/$version-release.tar.gz | tar -xzv
+  cd hue-$version-release
+  make apps
+END
+
+ADD -ifexist $hosts /tmp/hosts
+
+INSERT /src/hue-$version-release/desktop/conf/hue.ini << END
+[desktop]
+  default_hdfs_superuser=spark
+
+[hadoop]
+  [[hdfs_clusters]]
+    [[[default]]]
+      fs_defaultfs=hdfs://$hdfs:8020
+      webhdfs_url=http://$hdfs:50070/webhdfs/v1
+END
+
+EXPOSE 8000 $port
+
+WORKDIR /src/hue-$version-release
+
+START << END
+  [ -e /tmp/hosts ] && cat /tmp/hosts >> /etc/hosts
+  build/env/bin/hue runserver 0.0.0.0:8000
+END

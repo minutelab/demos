@@ -1,12 +1,10 @@
-Spark cluster
-=============
-This demo shows usage of a spark cluster.
+Spark examples
+==============
+This directory contain several examples of a spark cluster.
 
-The directory cluster contain scripts necessary to run a spark cluster.
-The main script is `spark.mlab` which create a cluster.
+The main directory is `cluster` which contain scripts to start a spark cluster.
 
-It is intended to run from within a containing setup that create a private network,
-and assign a static IP to the cluster master (the slaves get a dynamic IP).
+In addition there are:
 
-The directory word count contain an example running a simple wordcount python example,
-to this cluster.
+* wordcount - pyspark example of word counting using spark
+* zeppelin - example of running the zeppelin (with a spark cluster)
