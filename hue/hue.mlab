@@ -4,6 +4,7 @@ FLAG version=cdh5.11.0
 FLAG port=8000
 FLAG hdfs "address of hdfs name node"
 FLAG hosts hosts "hosts file"
+FLAG -bool detach "detach when ready"
 
 FROM ubuntu
 
@@ -42,5 +43,6 @@ WORKDIR /src/hue-$version-release
 
 START << END
   [ -e /tmp/hosts ] && cat /tmp/hosts >> /etc/hosts
+  [ "$detach" = true ] && mlab detach -p :8000 -t 60s &
   build/env/bin/hue runserver 0.0.0.0:8000
 END
