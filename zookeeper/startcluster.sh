@@ -45,5 +45,6 @@ done
 for n in $(seq 1 $NODES)
 do
     ip=$prefix.$(($ip_suffix + $n-1))
-    zoonode.mlab -version $VERSION -ip $ip -servers "${servers:1}" -id $n
+	mkdir -p /data/server.$n/data /data/server.$n/datalog
+    zoonode.mlab -version $VERSION -ip $ip -servers "${servers:1}" -id $n -datadir /data/server.$n
 done

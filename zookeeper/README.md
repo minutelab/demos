@@ -9,6 +9,7 @@ The main parameters are:
 * nodes - the number of nodes in the cluster (by default 3)
 * ip - The first IP in the cluster, the nodes will take consecutive addresses.
   So if this is 192.168.10.7, the addresses would be 192.168.10.7, 192.168.10.8, 192.168.10.9
-
+* datadir - if not empty allow to persist data, it can be either a volume name, or a moutned directory
+  (if run from another container)
 
 The script is intended to run from the context of a larger lab that can set static addresses, like `demo.mlab`

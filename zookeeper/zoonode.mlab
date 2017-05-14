@@ -4,14 +4,15 @@ FLAG version=3.4 "zookeeper version"
 FLAG ip "IP for the zookeeper"
 FLAG servers "list of zooservers: list of entries of the form server.<id>:<port>:<port>"
 FLAG id "zoo keepr ID"
-#FLAG datadir "datadir (to keep state)"
+FLAG datadir="VOLUME:-" "datadir (to keep state)"
 
 FROM zookeeper:$version
 
 NETCON $ip
 NAME zoo-$id
 
-#SHARE /mnt/data $datadir # XXX
+SHARE /data $datadir/data
+SHARE /datalog $datadir/datalog
 
 BACKGROUND mlab detach -p :2181 -t 60s
 
