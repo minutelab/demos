@@ -6,15 +6,28 @@ FLAG ver=2.1 "spark version"
 FLAG name="spark" "name for the cluster"
 FLAG datadir "directory/volume to store the data"
 FLAG workers=2 "number of workers"
+FLAG hport "hadoop web port"
 
 NAME -domain $name
 
-#EXPOSE 7077
 EXPOSE 8080
-#EXPOSE 6066
+EXPOSE 50070 $hport
 
 ADD $spath/spark*.mlab /src
 ADD $spath/conf/*.xml /src/conf
+
+INSERT -mode=766 /usr/local/bin/start_worker << END
+  node=node\$1
+
+  if [ \$node = node ]
+  then
+    echo "cannot start node - name not specified"
+    exit 1
+  fi
+  dir=/mnt/data/\$node
+  mkdir -p \$dir
+  ./spark_worker.mlab -ver $ver -name \$node -datadir \$dir
+END
 
 WORKDIR /src
 
@@ -29,9 +42,7 @@ START << END
   for n in `seq 1 $workers`
   do
     echo "starting node \$n"
-    dir=/mnt/data/node\$n
-    mkdir -p \$dir
-    ./spark_worker.mlab -ver $ver -name node\$n -datadir \$dir
+    start_worker \$n
   done
 
   echo "Cluster is Ready"

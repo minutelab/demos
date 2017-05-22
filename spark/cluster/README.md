@@ -40,3 +40,23 @@ There are two ways to avoid name collision:
 
 1. If the cluster is run from another container that parent container may create a private sub-domain
 2. Use the `-name` paramter. to replace the spark domain with another.
+
+## Dynamically addig/removing nodes from cluster
+
+Nodes can be added dynamically to existing cluster by issuing:
+
+```
+mlab exec spark start_worker <node id>
+```
+
+This command execute the script `start_worker` inside the `spark` container,
+the `spark` container is the parent container that start the whole cluster.
+
+It is started by the `spark.mlab` mlab script. That create and uses the `start_worker`
+shell script to start the worker nodes. The `mlab exec` command run the same script, but on-demand.
+
+Killing a node is even simpler:
+
+```
+mlab kill node<id>.spark
+```
