@@ -1,15 +1,13 @@
 #!/usr/bin/env mlab
 
 FLAG version=3.4 "zookeeper version"
-FLAG ip "IP for the zookeeper"
-FLAG servers "list of zooservers: list of entries of the form server.<id>:<port>:<port>"
 FLAG id "zoo keepr ID"
+FLAG servers "list of zooservers: list of entries of the form server.<id>=<ip>:<port>:<port>"
 FLAG datadir="VOLUME:-" "datadir (to keep state)"
 
 FROM zookeeper:$version
 
-NETCON $ip
-NAME zoo-$id
+NAME node-$id
 
 SHARE /data $datadir/data
 SHARE /datalog $datadir/datalog
@@ -22,5 +20,5 @@ START << END
   export ZOO_MY_ID=$id
   export ZOO_SERVERS="$servers"
 
-  /docker-entrypoint.sh zkServer.sh start-foreground || cat /conf/zoo.cfg
+  /docker-entrypoint.sh zkServer.sh start-foreground
 END

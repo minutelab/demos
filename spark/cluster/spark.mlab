@@ -3,13 +3,11 @@
 FROM ubuntu
 
 FLAG ver=2.1 "spark version"
-FLAG ip=default "spark master address"
-FLAG suffix="-spark" "suffix for container names"
-FLAG hosts=hosts "file to write hosts file"
+FLAG name="spark" "name for the cluster"
 FLAG datadir "directory/volume to store the data"
 FLAG workers=2 "number of workers"
 
-NAME cluster$suffix
+NAME -domain $name
 
 #EXPOSE 7077
 EXPOSE 8080
@@ -20,27 +18,23 @@ ADD $spath/conf/*.xml /src/conf
 
 WORKDIR /src
 
-OUTPUT /tmp/hosts $hosts
 SHARE /mnt/data $datadir
 
 START << END
-  master=master$suffix
+  set -x
 
   mkdir -p /mnt/data/master
-  ./spark_master.mlab -ver $ver -ip $ip -hosts /tmp/hosts -name \$master -datadir /mnt/data/master
-  masterip=`grep \$master /tmp/hosts | cut -f 1`
-  echo "Spark master: \$master - \$masterip"
+  ./spark_master.mlab -ver $ver  -datadir /mnt/data/master
 
   for n in `seq 1 $workers`
   do
     echo "starting node \$n"
     dir=/mnt/data/node\$n
     mkdir -p \$dir
-    ./spark_worker.mlab -ver $ver -master \$masterip -hosts /tmp/node -name node\$n$suffix -mname \$master -datadir \$dir
-    cat /tmp/node >> /tmp/hosts
+    ./spark_worker.mlab -ver $ver -name node\$n -datadir \$dir
   done
 
   echo "Cluster is Ready"
-  mlab detach --collect
+  mlab detach
   sleep 30d
 END

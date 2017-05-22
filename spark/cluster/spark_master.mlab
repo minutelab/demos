@@ -1,33 +1,28 @@
 #!/usr/bin/env mlab
 
 FLAG ver=2.1 "spark version"
-FLAG ip=default "Main IP"
 FLAG name=master "hostname"
 FLAG datadir "directory/volume to store the data"
-FLAG hosts=hosts "file to write hosts file"
 
 FROM singularities/spark:$ver
 
 NETCON $ip
 
 NAME $name
-HOSTNAME $name
 
 EXPOSE 7077
 EXPOSE 8080
 EXPOSE 6066
 
-BACKGROUND mlab detach --collect -p :7077 -t 120s -e 10
+BACKGROUND mlab detach  -p :7077 -t 120s -e 10
 
 RUN apt-get update &&  apt-get install -y vim
 
 ADD $spath/conf/*.xml /tmp/conf/
 RUN mv /tmp/conf/*.xml $HADOOP_CONF_DIR/
 
-OUTPUT /tmp/hosts $hosts
 SHARE /opt/hdfs $datadir
 
 START << END
-  grep `hostname` /etc/hosts > /tmp/hosts
   start-spark master
 END

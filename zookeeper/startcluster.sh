@@ -2,7 +2,7 @@
 
 # Start a zookeeper cluster with n nodes
 #
-# Usage: startcluster.sh [-v <version>] [-n <number of nodes>]] <first IP>
+# Usage: startcluster.sh [-v <version>] [-n <number of nodes>]
 
 set -x
 set -e
@@ -23,28 +23,10 @@ do
 done
 shift $((OPTIND-1))
 
-first_ip=$1
-
-if [ -z "$first_ip" ]
-then
-    echo "Error: did not get the first IP"
-    exit 1
-fi
-
-# divide mater IP into prefix and suffix
-ip_suffix=${first_ip##*.}
-prefix=${first_ip%.$ip_suffix}
+servers=$(seq -s " " $NODES | sed -e 's/\([0-9]\)/server.\1=node-\1:2888:3888/g')
 
 for n in $(seq 1 $NODES)
 do
-    ip=$prefix.$(($ip_suffix + $n-1))
-    echo "$ip server.$n" >> /tmp/hosts
-    servers="$servers server.$n=$ip:2888:3888"
-done
-
-for n in $(seq 1 $NODES)
-do
-    ip=$prefix.$(($ip_suffix + $n-1))
 	mkdir -p /data/server.$n/data /data/server.$n/datalog
-    zoonode.mlab -version $VERSION -ip $ip -servers "${servers:1}" -id $n -datadir /data/server.$n
+    zoonode.mlab -id $n -version $VERSION -servers "$servers" -datadir /data/server.$n
 done

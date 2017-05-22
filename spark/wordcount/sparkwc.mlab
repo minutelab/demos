@@ -2,8 +2,7 @@
 
 FROM singularities/spark:$ver
 
-FLAG hosts=hosts "hosts files containing names of cluster members"
-FLAG master=master-spark "IP or name of spark master"
+FLAG master=master.spark "IP or name of spark master"
 FLAG ver=2.1 "spark version"
 
 RUN curl http://www.gutenberg.org/files/2600/2600-0.txt > /root/warandpeace.txt
@@ -15,8 +14,6 @@ ADD $spath/count.py /root/
 EXPORT HADOOP_USER_NAME=spark
 EXPORT SPARK_VER=$ver
 EXPORT MASTERADDR=$master
-
-ADD -ifexist $hosts /tmp/hosts
 
 INSERT /tmp/core-site.xml << CONF
 <configuration>
@@ -32,7 +29,6 @@ WORKDIR /root
 OUTPUT /root/count count
 
 START << END
-  [ -e /tmp/hosts ] && cat /tmp/hosts >> /etc/hosts
   cp /tmp/core-site.xml \$HADOOP_CONF_DIR/core-site.xml
 
   echo "Uploading file to hdfs"

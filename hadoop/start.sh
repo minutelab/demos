@@ -41,12 +41,6 @@ function start_client {
   exec bash
 }
 
-# append entries to the /hosts file (avoiding our own)
-if [ -e /tmp/hosts ]
-then
-  grep -v "$name"  /tmp/hosts >> /etc/hosts
-fi
-
 # set up proper ssh
 mkdir -p /root/.ssh
 cd /root/.ssh
@@ -59,7 +53,6 @@ cp /etc/ssh/ssh_host_rsa_key.pub id_rsa.pub
 if [ -e master.pub ]
 then
   cat master.pub >> authorized_keys
-  #echo "hadoop-master `cat master.pub`" >> known_hosts
 fi
 
 # allow ssh localhost
@@ -76,7 +69,7 @@ service ssh start
 # done with ssh
 
 case "$name" in
-  hadoop-master) start_master ;;
+  master)        start_master ;;
   slave*)        start_slave  ;;
   *)             exec bash
 esac

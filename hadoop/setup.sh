@@ -2,18 +2,18 @@
 
 # Set up required paramters for hadoop cluster: SSH keys and IPs
 #
-# Usage: setup.sh <master IP> <number of slaves>
+# Usage: setup.sh [ -n <number of slaves> ] [ -v <hadoop version>] [ -d <data dir> ] [-r <replication factor>]
 
 set -e
 
 VER=2.7.3
 REP=2
 DATADIR=/tmp/data
+slaves=2
 
-while getopts m:n:v:r:d: opt
+while getopts n:v:r:d: opt
 do
 	case $opt in
-        m) master="$OPTARG" ;;
 		n) slaves="$OPTARG" ;;
 		v) VER="$OPTARG" ;;
         r) REP="$OPTARG" ;;
@@ -28,38 +28,17 @@ done
 shift $((OPTIND-1))
 
 KEYLEN=1024
-export HOSTS=/tmp/hosts
-
-
-# divide mater IP into prefix and suffix
-master_suffix=${master##*.}
-prefix=${master%.$master_suffix}
-
 
 # create master ssh key
 mkdir -p ssh/master
 ssh-keygen -t rsa -b $KEYLEN -P '' -f ssh/master/ssh_host_rsa_key -C master
 
-# create hosts
-echo "$master hadoop-master" >> $HOSTS
+# Launch slave containers
 for n in $(seq 1 $slaves)
 do
     name=slave${n}
-    ip=$prefix.$(($master_suffix + $n))
-    echo "$ip $name" >> $HOSTS
-done
 
-echo HOSTS:
-cat $HOSTS
-
-
-# Go overslaves
-for n in $(seq 1 $slaves)
-do
-    name=slave${n}
-    ip=$prefix.$(($master_suffix + $n))
-
-    echo "Creating $name - $ip"
+    echo "Creating $name"
 
     mkdir -p ssh/${name}
     ssh-keygen -t rsa -b $KEYLEN -P '' -f ssh/${name}/ssh_host_rsa_key -C $name
@@ -68,7 +47,7 @@ do
     list="$list,$name"
 
     mkdir -p $DATADIR/$name
-    hadoop.mlab -ver $VER -replication $REP -name $name -ip $ip -datadir $DATADIR/$name -keys ssh/${name} -masterkey ssh/master/ssh_host_rsa_key.pub
+    hadoop.mlab -ver $VER -replication $REP -name $name -datadir $DATADIR/$name -keys ssh/${name} -masterkey ssh/master/ssh_host_rsa_key.pub
 done
 
 # remove the initial comma
@@ -76,4 +55,4 @@ list=${list:1}
 
 mkdir -p $DATADIR/hadoop-master
 
-hadoop.mlab -ver $VER -replication $REP -name hadoop-master -ip $master  -datadir $DATADIR/hadoop-master -keys ssh/master -slaves $list -knownhosts ssh/known_hosts -hdfsweb 50070 -yarnweb 8088
+hadoop.mlab -ver $VER -replication $REP -name master  -datadir $DATADIR/hadoop-master -keys ssh/master -slaves $list -knownhosts ssh/known_hosts -hdfsweb 50070 -yarnweb 8088

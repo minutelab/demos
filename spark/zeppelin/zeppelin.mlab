@@ -1,7 +1,6 @@
 #!/usr/bin/env mlab
 
 FLAG port=8081
-FLAG hosts=hosts
 FLAG data="VOLUME:zeppelin" "directory or volume to permanently store data"
 FLAG version=0.7.1 "Zeppelin version"
 FLAG sparkver=2.1.0 "spark version"
@@ -23,15 +22,11 @@ END
 
 EXPORT SPARK_HOME=/usr/local/spark
 
-ADD -ifexist $hosts /tmp/hosts
-
 SHARE /mnt/data $data
 
 EXPOSE 8080 $port
 
 START <<END
-  [ -e /tmp/hosts ] && cat /tmp/hosts >> /etc/hosts
-
   cd /usr/local/zeppelin
 
   if [ ! -d /mnt/data/notebook ]

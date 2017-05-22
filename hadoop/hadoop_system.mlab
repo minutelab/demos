@@ -5,9 +5,11 @@ FROM ubuntu
 FLAG ver=2.7.3 "hadoop version"
 FLAG nslaves=2 "number of slaves"
 FLAG datavolume "if not empty use persistant data in this volume"
+FLAG name="hdemo"
 
 NETDEF 192.168.200.0/25 -default
-SET master=192.168.200.10
+
+NAME -domain $name
 
 ADD $spath/*.xml $spath/*.mlab $spath/*.sh /src
 
@@ -24,7 +26,6 @@ START << END
       volume="-datavolume VOLUME:$datavolume"
     fi
 
-    ./hadoop_cluster.mlab -ver $ver -nslaves $nslaves -master $master \$volume -hostdir /tmp/hosts
-    export HOSTS=/tmp/hosts/hosts
+    ./hadoop_cluster.mlab -ver $ver -nslaves $nslaves \$volume
     ./hadoop.mlab -ver $ver
 END

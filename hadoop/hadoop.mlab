@@ -6,11 +6,9 @@ IMPORT HOSTS
 
 FLAG ver=2.7.3        "hadoop version"
 FLAG name="client"    "node name"
-FLAG ip               "node IP (mandatory)"
 FLAG datadir          "Directory for mounting data"
 FLAG replication=2    "number of replications for hdfs"
 FLAG keys             "directory with ssh keys"
-FLAG hosts=$HOSTS     "additional host file"
 FLAG masterkey        "master public ssh key"
 FLAG slaves           "list of slaves"
 FLAG knownhosts       "kown_hosts file (with all slaves)"
@@ -19,7 +17,7 @@ FLAG yarnweb=0        "port for yarn web management"
 
 NETCON $ip
 
-HOSTNAME $name
+NAME $name
 
 SHARE /mnt/hdfs $datadir
 
@@ -72,7 +70,6 @@ END
 
 ADD -ifexist $keys/ssh_host_rsa_key* /etc/ssh
 
-ADD -ifexist $hosts /tmp/hosts
 ADD -ifexist $masterkey /root/.ssh/master.pub
 ADD -ifexist $knownhosts /root/.ssh/known_hosts
 

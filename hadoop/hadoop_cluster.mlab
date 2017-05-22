@@ -5,10 +5,9 @@ FROM ubuntu
 FLAG ver=2.7.3 "hadoop version"
 FLAG nslaves=2 "number of slaves"
 FLAG datavolume "volume containing the data"
-FLAG master "IP of the master"
-FLAG hostdir "Directory to put (share) host file"
+FLAG name=hadoop
 
-HOSTNAME hadoop-clusetr
+NAME -domain $name
 
 RUN << END
     apt-get update
@@ -25,12 +24,10 @@ EXPOSE 50070 50070
 EXPOSE 8088 8088
 
 SHARE /tmp/data $datavolume
-SHARE /tmp/hostdir $hostdir
 
 START << END
     set -x
-    setup.sh -m "$master" -n $nslaves -v $ver
-    cp hosts /tmp/hostdir
+    setup.sh -n $nslaves -v $ver
     mlab detach
     sleep 7d
 END

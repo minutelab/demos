@@ -10,18 +10,9 @@ This directory contain script required to run a Spark cluster. It features:
 
 The simplest way to run it is:
 
-   spark.mlab -hosts <file>
+   spark.mlab
 
-Once the cluster is read the container will detach (see the next section for the meaining of the `-hosts` flag)
-
-## Hosts file (a poor man's "DNS")
-
-To reliably work with a spark cluster client need to have resolvable names for all the cluster members.
-Since at the time of writing (May 2017) Minute Lab don't have built in DNS integration, the example uses
-hosts file.
-
-Once the cluster is ready it output a hosts file (to the place specified with the `-hosts` paramter),
-this can be imported to other containers (see for example the hue and zeppelin examples)
+Once the cluster is read the container will detach
 
 ## Data persistence
 
@@ -39,11 +30,13 @@ The number of workers can be specified with the `-workers` parameter
 
 By default all the containers have names, as follows:
 
-* cluster-spark - the container responsible for all the cluster. To stop the cluster kill it: `mlab kill cluster-spark`
-* master-spark - The master spark node (which is also the hdfs name node)
-* node<N>-spark - The Nth node in the cluster
+* spark - the container responsible for all the cluster. To stop the cluster kill it: `mlab kill cluster-spark`
+* master.spark - The master spark node (which is also the hdfs name node)
+* node<N>.spark - The Nth node in the cluster
+
+The names are both for DNS access and container names to be used by mlab commands.
 
 There are two ways to avoid name collision:
 
 1. If the cluster is run from another container that parent container may create a private sub-domain
-2. The `-suffix` paramter can be used to replace the `-spark` suffix with another.
+2. Use the `-name` paramter. to replace the spark domain with another.

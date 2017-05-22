@@ -2,14 +2,17 @@
 
 FROM zookeeper
 
-NETDEF 192.168.200.0/24 -default
+FLAG name=zoodemo
+
+NAME -domain $zoodemo
 
 ADD $spath/*.mlab $spath/*.sh /usr/local/bin
 
 EXPORT path=$path:/zookeeper/bin
 
 START << END
-    zoocluster.mlab -ip 192.168.200.10
-    echo stat | nc 192.168.200.10:2181
-    zkCli.sh -server 192.168.200.10:2181
+    zoocluster.mlab
+    echo stat | nc node-1.zoo:2181
+    echo
+    zkCli.sh -server node-1.zoo:2181
 END

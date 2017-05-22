@@ -1,29 +1,23 @@
 #!/usr/bin/env mlab
 
 FLAG ver=2.1 "spark version"
-FLAG master "Master IP"
-FLAG mname="master" "master name"
-FLAG name "hostname"
+FLAG master="master" "Master name"
+FLAG name="slave-???" "host name"
 FLAG datadir "directory/volume to store the data"
-FLAG hosts=hosts "file to write hosts file"
 
 NAME $name
-HOSTNAME $name
 
 FROM singularities/spark:$ver
 
-BACKGROUND mlab detach --collect -p :8081 -t 240s -e 11
+BACKGROUND mlab detach -p :8081 -t 240s -e 11
 
 ADD $spath/conf/*.xml /tmp/conf/
 RUN mv /tmp/conf/*.xml $HADOOP_CONF_DIR/
 
 EXPORT MASTER=$master
 
-OUTPUT /tmp/hosts $hosts
 SHARE /opt/hdfs $datadir
 
 START << END
-  grep `hostname` /etc/hosts > /tmp/hosts
-  echo "$master $mname" >> /etc/hosts
-  start-spark worker $MASTER
+  start-spark worker $master
 END

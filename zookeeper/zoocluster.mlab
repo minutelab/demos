@@ -1,18 +1,20 @@
 #!/usr/bin/env mlab
 
 FLAG version=3.4 "zookeeper version"
-FLAG ip "IP for the first zookeeper"
 FLAG nodes=3 "number of nodes"
 FLAG datadir "persistance data directory"
+FLAG name=zoo
 
 FROM ubuntu
+
+NAME -domain $name
 
 ADD $spath/zoonode.mlab $spath/startcluster.sh /usr/local/bin
 
 SHARE /data $datadir
 
 START << END
-   startcluster.sh -n $nodes -v $version $ip
+   startcluster.sh -n $nodes -v $version
    mlab detach
    sleep 3d
 END
