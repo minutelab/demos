@@ -3,9 +3,12 @@
 FROM ubuntu
 
 FLAG version=0.10.2.0
+FLAG name=kafka "container name"
 FLAG zookeeper "zookeeper IP"
 FLAG nodes=2 "Number of nodes"
 FLAG datadir "directory for data (for all members)"
+
+NAME -domain $name
 
 SHARE /data $datadir
 

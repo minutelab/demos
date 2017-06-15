@@ -17,9 +17,14 @@ EXPORT KAFKA_BROKER_ID=$id
 SHARE /log $logdir
 SHARE /data $datadir
 
-BACKGROUND mlab detach -p :9092 -t 60s
+BACKGROUND mlab detach -p :9092 -t 60s -e 13
 
 START << END
   export ZOOKEEPER_CONNECTION_STRING=`echo $zookeeper | sed -e 's/\([^,]*\)/\1:2181/g'`
-  /start.sh || bash
+  while true
+  do
+    /start.sh || echo "Failed starting (already registered?)"
+    sleep 1
+    echo "trying again"
+  done
 END
