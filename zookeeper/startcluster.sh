@@ -4,7 +4,7 @@
 #
 # Usage: startcluster.sh [-v <version>] [-n <number of nodes>]
 
-set -x
+# set -x
 set -e
 
 NODES=3
@@ -29,4 +29,11 @@ for n in $(seq 1 $NODES)
 do
 	mkdir -p /data/server.$n/data /data/server.$n/datalog
     zoonode.mlab -id $n -version $VERSION -servers "$servers" -datadir /data/server.$n
+done
+
+# wait for all nodes to start
+for n in $(seq 1 $NODES)
+do
+  echo "waiting for node-$n"
+  mlab exec node-$n /wait.sh
 done

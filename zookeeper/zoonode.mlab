@@ -12,7 +12,22 @@ NAME node-$id
 SHARE /data $datadir/data
 SHARE /datalog $datadir/datalog
 
-BACKGROUND mlab detach -p :2181 -t 60s
+INSERT -mode=0755 /wait.sh << "END"
+#!/bin/bash
+
+counter=0
+while [ $counter -lt 50 ]
+do
+    if zkServer.sh status
+    then
+      mlab detach
+      exit
+    fi
+    let counter=counter+1
+    echo "Failed attempt $counter"
+    sleep 0.2
+done
+END
 
 START << END
   echo "starting node $id"
@@ -20,5 +35,6 @@ START << END
   export ZOO_MY_ID=$id
   export ZOO_SERVERS="$servers"
 
+  mlab detach
   /docker-entrypoint.sh zkServer.sh start-foreground
 END
