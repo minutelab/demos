@@ -1,0 +1,37 @@
+#!/usr/bin/env mlab
+
+FLAG dbhost Database host
+FLAG -bool test=false Run unit tests
+
+FROM ubuntu
+
+RUN apt-get update && \
+    apt-get install -y python3-pip
+
+RUN apt-get install -y python3-psycopg2
+
+RUN pip3 install flask
+
+SHARE /src $spath/../src
+
+EXPOSE 5000 5000
+
+WORKDIR /src
+
+INSERT /tmp/flaskr.cfg << END_CONFIG
+   DBHOST='$dbhost'
+END_CONFIG
+
+EXPORT FLASKR_SETTINGS=/tmp/flaskr.cfg
+
+OPTION tty
+
+START << END
+  set -e
+  if [ "$test" = false ]
+  then
+    python3 flaskr.py
+  else
+    python3 flaskr_tests.py
+  fi
+END

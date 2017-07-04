@@ -1,0 +1,15 @@
+#!/usr/bin/env mlab
+
+FLAG ver=latest Posgres version
+FLAG port=5432  Exposed port
+FLAG ip=default IP to be used for server
+
+FROM postgres:$ver
+
+NETCON $ip
+
+EXPOSE 5432 $port
+
+BACKGROUND mlab detach -p :5432 -t 30s
+
+START /docker-entrypoint.sh postgres

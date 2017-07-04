@@ -1,0 +1,27 @@
+#!/usr/bin/env mlab
+
+FROM ubuntu
+
+FLAG -bool test=false Run unit tests
+FLAG port=5000 Server port
+FLAG pgver=9.4 postgres server version
+
+# Create a private network, as the default for the sub containers
+
+NETDEF 192.168.200.0/25 -default
+
+SET DBADDR=192.168.200.10
+
+# EXPOSE sub containers web port
+
+EXPOSE 5000 $port
+
+SHARE /flaskr $spath/..
+
+OUTPUT /tmp/output flaskr_output
+
+START << END
+   set -e
+   mlab run /flaskr/tests/postgres.mlab -ip $DBADDR -ver $pgver
+   mlab run /flaskr/tests/flaskr.mlab -test=$test -dbhost $DBADDR 2>&1 | tee /tmp/output
+END
