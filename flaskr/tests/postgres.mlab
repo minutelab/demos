@@ -12,4 +12,6 @@ EXPOSE 5432 $port
 
 BACKGROUND mlab detach -p :5432 -t 30s
 
+CONNECT CONSOLE psql "psql -U postgres"
+
 START /docker-entrypoint.sh postgres

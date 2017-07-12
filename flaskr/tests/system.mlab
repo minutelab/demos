@@ -20,6 +20,8 @@ SHARE /flaskr $spath/..
 
 OUTPUT /tmp/output flaskr_output
 
+CONNECT WEB web http://5000
+
 START << END
    set -e
    mlab run /flaskr/tests/postgres.mlab -ip $DBADDR -ver $pgver
