@@ -29,6 +29,8 @@ do
 done
 END
 
+CONNECT CONSOLE zkCLI zkCli.sh
+
 START << END
   echo "starting node $id"
 

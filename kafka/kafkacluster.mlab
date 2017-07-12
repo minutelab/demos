@@ -14,14 +14,26 @@ SHARE /data $datadir
 
 ADD $spath/kafkanode.mlab /usr/local/bin
 
+RUN echo 0 > /last
+
 INSERT -mode=0555 /usr/local/bin/start_broker << END
   #!/bin/bash
+
+  # compute ID and save last ID
+  last=`cat /last`
   id=\$1
+  [ -z \$id ] && let id=\$last+1
+  [ \$id -gt \$last ] && echo \$id > /last
+
+  echo "Starting broker \$id"
+
   dir=/data/broker-\$id
   mkdir -p \$dir/data
   mkdir -p \$dir/log
   kafkanode.mlab -version $version -zookeeper $zookeeper -id \$id -datadir \$dir/data -logdir \$dir/log
 END
+
+CONNECT CONSOLE add_broker start_broker
 
 START << END
   if [ -z "$zookeeper" ]
@@ -32,7 +44,7 @@ START << END
 
   for n in `seq 1 $nodes`
   do
-    start_broker \$n
+    start_broker
   done
   mlab detach
   sleep 3d
