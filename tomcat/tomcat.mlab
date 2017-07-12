@@ -1,0 +1,37 @@
+#!/usr/bin/env mlab
+
+FROM tomcat:$version
+
+FLAG version=8.5 "tomcat version"
+FLAG port=8080 "exposed port"
+FLAG debugport=5005 "port for remote debugging"
+FLAG name=tomcat "container name"
+FLAG -bool detach "detach when ready"
+
+NAME $name
+
+EXPOSE 8080 $port
+
+RUN sed -i -e 's/<Context>/<Context reloadable="true">/' /usr/local/tomcat/conf/context.xml
+
+# We share the whole source and use symbolic links to the app directory,
+# becauase if we mount directly the app directory, mvn clean delete it
+# in a way that future installs don't recreate it
+SHARE /src $spath
+RUN ln -s /src/target/app /usr/local/tomcat/webapps/hellowar
+
+EXPOSE 5005 $debugport
+
+CONNECT WEB web http://8080/hellowar
+
+START << END
+   export JAVA_OPTS='-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005'
+   if [ $detach = true ]
+   then
+     catalina.sh start
+     mlab detach -p :8080 -t 20s
+     sleep 2d
+   else
+     catalina.sh run
+   fi
+END

@@ -1,0 +1,17 @@
+#!/usr/bin/env mlab
+
+FROM tomcat:$version
+
+FLAG version=8.5 "tomcat version"
+FLAG port=8081 "exposed port"
+FLAG name=tomact-war "container name"
+
+NAME $name
+
+EXPOSE 8080 $port
+
+ADD $spath/target/app.war //usr/local/tomcat/webapps/hellowar.war
+
+START << END
+   catalina.sh run
+END
