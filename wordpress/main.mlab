@@ -1,0 +1,45 @@
+#!/usr/bin/env mlab
+
+FROM ubuntu
+
+FLAG name=myproj project name
+
+NAME $name
+
+# Create a private network, as the default for the sub containers
+NETDEF 192.168.200.0/25 -default
+
+SET DBADDR=192.168.200.10
+
+ADD -dos2unix $spath/*.mlab /wp
+
+# expose wordpress sub containers web port
+EXPOSE 80 0
+CONNECT -description="wordpress dashboard" WEB wordpress http://80/wp-admin/
+
+#TODO
+#substr=\${inspect#*\"internal\": 80,*\"external\": }
+#external=\${substr%%,*}
+
+START << END
+  #!/bin/bash
+  set -e
+
+  #get current allocated port
+  inspect=\$(mlab inspect)
+  s1="\${inspect#*\"internal\"}"
+  s2="\${s1#*: 80,}"
+  s3="\${s2#*\"external\"}"
+  substr="\${s3#*: }"
+  external="\${substr%%,*}"
+
+  mlab run /wp/db.mlab -ip $DBADDR -name $name
+  mlab run /wp/phpMyAdmin.mlab -dbhost $DBADDR -name $name &
+  mlab run /wp/wordpress.mlab -dbhost $DBADDR -name $name -ext \$external
+
+  mlab exec  ${name}-wp wpconfig
+  mlab exec  ${name}-wp sqlupdate
+
+  echo "Lab is ready...."
+  bash
+END

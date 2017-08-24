@@ -1,0 +1,63 @@
+#!/usr/bin/env mlab
+
+#FROM tatemz/wp-cli
+FROM wordpress
+
+NAME ${name}-wp
+
+FLAG dbhost Database host
+FLAG name=wpProj wordpress persistent folder
+FLAG ext allocated port
+
+# install shell tools
+RUN apt-get update && apt-get install -y vim
+
+#install wp cli
+# Install requirements for wp-cli support
+RUN apt-get install -y sudo less mysql-client \
+  && rm -rf /var/lib/apt/lists/*
+
+# Add WP-CLI
+RUN curl -o /bin/wp-cli.phar https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
+RUN chmod +x /bin/wp-cli.phar
+
+INSERT -mode=0555 /bin/wp << "END"
+#!/bin/sh
+# This is a wrapper so that wp-cli can run as the www-data user so that permissions
+# remain correct
+sudo -u www-data /bin/wp-cli.phar "$@"
+END
+
+# end wp cli installation
+
+INSERT -mode=0555 /usr/local/bin/wpconfig  << "END_CONFIG"
+  #!/bin/bash
+
+  grep -q -F 'WP_SITEURL' /var/www/html/wp-config.php || echo "define('WP_SITEURL', 'http://' . \$_SERVER['HTTP_HOST']);" >> /var/www/html/wp-config.php
+  grep -q -F 'WP_HOME' /var/www/html/wp-config.php || echo "define('WP_HOME', 'http://' . \$_SERVER['HTTP_HOST']);" >> /var/www/html/wp-config.php
+END_CONFIG
+
+EXPORT WORDPRESS_DB_HOST=$dbhost:3306
+EXPORT WORDPRESS_DB_PASSWORD=example
+
+INSERT -mode=0555 /usr/local/bin/sqlupdate  << END_MYSQL
+  #!/bin/bash
+
+  #get previus port from the database
+  siteurl="\$(mysql -h 192.168.200.10 --user=root --password=example wordpress -e \"select option_value from wp_options where option_name='siteurl';\")"
+  if [ \$? -eq 1 ]
+  then
+    echo "DB is not initielized"
+  else
+    prev="\${siteurl#*127.0.0.1:}"
+    echo prev:\$prev
+    echo curr:$ext
+    wp search-replace 127.0.0.1:\$prev 127.0.0.1:$ext --skip-columns=guid
+  fi
+END_MYSQL
+
+EXPOSE 80 80
+
+SHARE /var/www/html/ VOLUME:${name}_wp
+
+BACKGROUND mlab detach -p :80 -t 30s

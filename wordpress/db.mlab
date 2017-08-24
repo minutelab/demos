@@ -1,0 +1,20 @@
+#!/usr/bin/env mlab
+
+FROM mariadb
+
+FLAG ip=default IP to be used for DB server
+FLAG name=mariadb database persistent folder
+
+NAME ${name}-db
+
+NETCON $ip
+
+EXPORT MYSQL_ROOT_PASSWORD=example
+
+EXPOSE 3306 3306
+
+SHARE /var/lib/mysql/ VOLUME:${name}_db
+
+BACKGROUND mlab detach -p :3306 -t 30s
+
+CONNECT -description="mysql client - command line" CONSOLE mysql "mysql --user=root --password=example  wordpress"

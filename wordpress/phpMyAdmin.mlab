@@ -1,0 +1,18 @@
+#!/usr/bin/env mlab
+FROM phpmyadmin/phpmyadmin
+
+FLAG dbhost Database host
+FLAG name=phpmyadmin phpmyadmin name
+
+NAME ${name}-pma
+
+RUN apk update && apk upgrade && apk add bash
+
+EXPORT PMA_HOST=$dbhost
+# EXPORT PMA_PORT=3306
+EXPORT PMA_USER=root
+EXPORT PMA_PASSWORD=example
+
+EXPOSE 80 0
+
+CONNECT -description="phpMyAdmin" WEB admin http://80
