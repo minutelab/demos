@@ -1,52 +1,52 @@
 WordPress development environment
 =================================
 
-This directory contains scripts to initialize and run an isolated WordPress development environment.
-An isolated WordPress environment is establish for each project, distinguished from other WordPress projects by its project name.
+This directory described how to run a WordPress development environment in Minute Lab.
+It allows a user to initialize and run an isolated WordPress environment for every worpress project.
+Each environment (or a 'setup') is distinguished from other WordPress projects in Minute Lab by its project name.
+
+The setup is composed of several components or containers. The main container, `main.mlab`(henceforth called `main`), starts the entire setup.
+Launching the setup is done using mlab desktop client to run main. When running the setup, a 'project name' (an input parameter) is required. This project name should be unique, and is used from that point on as an identifier to re-open a specific project in wordpress.
 
 
-The main container, `main.mlab`, starts the entire environment.
-The main receives as a parameter the project name. this project name should be unique, and will be used as an identifier to re-connect a specific project.
-
-
-The WordPress setup includes the following tools:
+The WordPress setup includes the following tools, commonly required by wordpres developers:
 * WordPress
 * Database
 * phpMyAdmin
 * WP-CLI
 
-## Working with WordPress development environment
+## Working with a WordPress development environment
 
 ### Creating a new project
 
-In order to create an entire new and clean project, a new project name should be given while establishing the setup.
-The given project name will be used as a project ID during the life cycle of the project.
+To create a new project, enter a new project name as the input parameter needed when running the WordPress setup. 
+The given project name will be used as a project identifier for the entire project lifecycle.
 
 The following steps are required to initiate a new project:
 
 * Run `main.mlab` with a new project name as a parameter.
-* Wait as the setup initializes, until all 4 containers are active.
-* activate the `wordpress` action of the main container.
-* Start work with WordPress dashboard to create your new project.
+* Wait as the setup initializes, until all four containers are active and the associated command prompt reports "Lab is ready....".
+* In the mlab desktop client, go to 'Setups' and hover over the main container, represented by the project name. On the right side, a 'terminate container' and a 'connect' buttons will appear. Click the connect button and select 'WordPress' from the menu. This will activate the `WordPress` action enabled by the main container.
+* Start to work with WordPress dashboard to create your new project.
 
-### Connecting to an existing project
+### Reopening an existing project
 
-In order to connect an existing project, The required project name should be given when launchin the setup.
-The given project name is used as a project ID during the entire life cycle of the project and its content.
+To re-open an existing project, The required project name should be entered when launching the setup.
+The project name is used as a project identifier throughout the entire lifecycle of the project and its content.
 
-The following steps are required to re-connect an existing project:
+Follow these steps to reopen an existing project:
 
 * Run `main.mlab` with the desired project name as a parameter.
-* Wait as the setup initializes, until all 4 containers are active.
+* Wait as the setup initializes, until all 4 containers are active and the associated command prompt reports "Lab is ready....".
 * Continue working on the project via WordPress dashboard or any other tool.
 
 ## Setup description
 
-MinuteLab setup for WordPress development environment is composed from several containers, each represented by `.mlab` script.
+Minute Lab setup for WordPress development environment is composed of several containers, each defined by `.mlab` script.
 
-### `main.mlab` - orchestrating the other containers in the setup.
+### `main.mlab` - orchestrates the other containers in the setup.
 
-Creates a full environment of a WordPress + database + phpMyAdmin running in their own private network.
+Creates a full environment including WordPress + database + phpMyAdmin interconnected via a private network.
 
 **NAME**
 
@@ -58,12 +58,12 @@ The main container name is the `project name` parameter.
 
 **ACTIONS**
 
-* wordpress - connecting the WordPress dashboard in a browser window.
-* shell - open a bash command line window connected to the container.
+* wordpress - Opens the WordPress dashboard in a web browser window.
+* shell - opens a bash command line window connected to the container.
 
 ### `wordpress.mlab` - a WordPress server.
 
-This script initialize a WordPress server including a WP-CLI tool.
+This script initializes a WordPress server including a WP-CLI tool.
 
 **NAME**
 
@@ -79,7 +79,7 @@ While activating the WordPress setup as a single unit (main.mlab), the main cont
 
 **ACTIONS**
 
-* shell - open a bash command line window connected to the container. This shell can be used for WP-CLI commands (addressed as 'wp').
+* shell - opens a bash command line window connected to the container. This shell can be used for WP-CLI commands (addressed as 'wp').
 
 
 ### `db.mlab` - a generic mariadb server
@@ -93,17 +93,17 @@ The database container name is [project name]-db.
 
 **PARAMETERS**
 
-While activating the WordPress development environment as single unit (main.mlab), the main container controls the parameters.
+While activating the WordPress development environment as a single unit (main.mlab), the main container controls the parameters.
 
-* Database IP Address. The IP address the database.
-* project name. The project name is used as a unique identifier of a project.
+* Database IP Address. The database's IP address.
+* project name. Used as the project unique identifier.
 
 **ACTIONS**
 
 * mysql - opens a mysql command-line client.
 * shell - open a bash command-line window connected to the container.
 
-### `phpMyAdmin.mlab` - an administration of MySQL / MariaDB over the Web
+### `phpMyAdmin.mlab` - MySQL administration / MariaDB over the Web
 
 This script initializes a phpMyAdmin application server.
 
@@ -116,9 +116,9 @@ The phpMyAdmin container name is [project name]-pma.
 While activating the WordPress setup as single unit (main.mlab), the main container controls the parameters.
 
 * Database host. The IP address of the setup database.
-* project name. The project name is used as a unique identifier of a project.
+* project name. Used as the project unique identifier.
 
 **ACTIONS**
 
-* admin - connecting the phpMyAdmin dashboard in a browser.
+* admin - Opens a phpMyAdmin dashboard in a web browser.
 * shell - open a bash command-line window connected to the container. This shell can be used for WP-CLI commands.
