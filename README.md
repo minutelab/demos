@@ -6,6 +6,7 @@ The repository contains various demos and examples of building and running a [Mi
 
 * `bash` - A simple container just running bash. Shows how the bash history can be saved on desktop
   between script invocation
+* `flaskr` - A simple web application composed of a web front-end and a database to demonstrate Minute Lab's features 
 * `docker` - Demonstrates running docker inside Minute Lab and using Minute Lab's feature to work with it.
 * `spark` - Several examples with spark
   * `cluster` - scripts to create a spark cluster
@@ -16,3 +17,5 @@ labs inside Java "unit" testing.
 * `hue` - running [Hue](http://gethue.com)
 * `zookeeper` - running Zoo Keeper cluster
 * `kafka` - running Kafka cluster
+* `Tomcat` - show how a Java based web application can be developed and run interactively using Minute Lab.
+* `wordpress` - Demonstrates how to setup and run a WordPress development environment in Minute Lab
