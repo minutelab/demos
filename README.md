@@ -4,6 +4,10 @@
 
 The repository contains various demos and examples of building and running a [Minute Lab](http://minutelab.io) setup.
 
+***Note:*** To use/run the demos you will need to onboard the Minute Lab service. 
+It is recommended to use the [Minute Lab's QuickStart Guide](http://docs.minutelab.io/user-guide/quickstart/).
+Since many of the demos requirea a shared sync, it is recommended to share the whole demos directory, but you can be more specific.
+
 * `bash` - A simple container just running bash. Shows how the bash history can be saved on desktop
   between script invocation
 * `flaskr` - A simple web application composed of a web front-end and a database to demonstrate Minute Lab's features 
