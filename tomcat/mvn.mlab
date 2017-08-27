@@ -1,0 +1,20 @@
+#!/usr/bin/env mlab
+
+FROM maven
+
+FLAG cache=mavencache "name of volume with maven cache"
+
+SHARE /root/.m2 VOLUME:$cache
+
+SHARE /src .
+
+WORKDIR /src
+
+START << END
+    if [ -z "$1" ]
+    then
+      exec bash
+    fi
+
+    mvn "$@"
+END
