@@ -103,7 +103,7 @@ While activating the WordPress development environment as a single unit (main.ml
 * mysql - opens a mysql command-line client.
 * shell - open a bash command-line window connected to the container.
 
-### `phpMyAdmin.mlab` - MySQL administration / MariaDB over the Web
+### `phpMyAdmin.mlab` - MySQL/MariaDB administration over the Web
 
 This script initializes a phpMyAdmin application server.
 
