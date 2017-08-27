@@ -5,8 +5,17 @@ This directory described how to run a WordPress development environment in Minut
 It allows a user to initialize and run an isolated WordPress environment for every worpress project.
 Each environment (or a 'setup') is distinguished from other WordPress projects in Minute Lab by its project name.
 
+### Prerequisites
+
+1. On-board the Minute Lab service. It is recommended to use the
+   [Minute Lab's QuickStart Guide](http://docs.minutelab.io/user-guide/quickstart/).
+2. Configure a shared sync that includes the example directory.
+   (it is recommended to share the whole demos directory, but you can be more specific)
+
+### Running WordPress
+
 The setup is composed of several components or containers. The main container, `main.mlab`(henceforth called `main`), starts the entire setup.
-Launching the setup is done using mlab desktop client to run main. When running the setup, a 'project name' (an input parameter) is required. This project name should be unique, and is used from that point on as an identifier to re-open a specific project in wordpress.
+Launching the setup is done using Minute Lab's desktop client to run main. When running the setup, a 'project name' (an input parameter) is required. This project name should be unique, and is used from that point on as an identifier to re-open a specific project in wordpress.
 
 
 The WordPress setup includes the following tools, commonly required by wordpres developers:
