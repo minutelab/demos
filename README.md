@@ -14,8 +14,8 @@ The repository contains various demos and examples of building and running a [Mi
   * `wordcount` - classic word count example with the spark cluster
 * `hadoop` - shows a cluster of hadoop (hdfs + yarn) with variable versions and a number of slaves
 labs inside Java "unit" testing.
-* `hue` - running [Hue](http://gethue.com)
-* `zookeeper` - running Zoo Keeper cluster
-* `kafka` - running Kafka cluster
+* `hue` - running [Hue](http://gethue.com) in Minute Lab
+* `zookeeper` - running a Zoo Keeper cluster in Minute Lab
+* `kafka` - running a Kafka cluster in Minute Lab
 * `Tomcat` - show how a Java based web application can be developed and run interactively using Minute Lab.
 * `wordpress` - Demonstrates how to setup and run a WordPress development environment in Minute Lab
