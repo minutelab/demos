@@ -1,0 +1,18 @@
+#!/usr/bin/env mlab
+
+FROM alpine
+
+FLAG volume
+FLAG out=out "output location"
+
+RUN apk add --update bash && rm -rf /var/cache/apk/*
+
+ADD $* /upload/
+
+SHARE /mnt VOLUME:$volume
+
+START << END
+#!/bin/bash
+shopt -s dotglob
+cp -av /upload/* /mnt
+END

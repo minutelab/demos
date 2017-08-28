@@ -1,0 +1,12 @@
+#!/usr/bin/env mlab
+
+FROM alpine
+
+FLAG volume
+FLAG out=out "downlaod location"
+
+SHARE /mnt VOLUME:$volume
+
+OUTPUT /mnt $out
+
+START echo "downloading"
