@@ -1,6 +1,5 @@
 #!/usr/bin/env mlab
 
-#FROM tatemz/wp-cli
 FROM wordpress
 
 NAME ${name}-wp
@@ -61,3 +60,11 @@ EXPOSE 80 80
 SHARE /var/www/html/ VOLUME:${name}_wp
 
 BACKGROUND mlab detach -p :80 -t 30s
+
+START << END
+  if [ -n "$ext" ]
+  then
+    echo "Listen $ext" >> /etc/apache2/ports.conf
+  fi
+  exec docker-entrypoint.sh apache2-foreground
+END
