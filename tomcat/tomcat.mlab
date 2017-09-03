@@ -22,7 +22,9 @@ RUN ln -s /src/target/app /usr/local/tomcat/webapps/hellowar
 
 EXPOSE 5005 $debugport
 
-CONNECT WEB web http://8080/hellowar
+BACKGROUND mlab ready -p :8080
+
+CONNECT -auto WEB web http://8080/hellowar
 
 START << END
    export JAVA_OPTS='-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005'

@@ -20,7 +20,9 @@ SHARE /flaskr $spath/..
 
 OUTPUT /tmp/output flaskr_output
 
-CONNECT WEB web http://5000
+BACKGROUND mlab ready -p :5000
+
+CONNECT -auto WEB web http://5000
 
 START << END
 #!/bin/bash

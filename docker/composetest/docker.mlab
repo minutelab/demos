@@ -15,7 +15,9 @@ SHARE /var/lib/docker $dockerdb
 
 SHARE /code $spath
 
-#BACKGROUND mlab detach -p :2375 -t 30s
+BACKGROUND mlab ready -p :5000
+
+CONNECT -auto WEB web http://5000
 
 START << END
   set -x

@@ -15,7 +15,9 @@ ADD -dos2unix $spath/*.mlab /wp
 
 # expose wordpress sub containers web port
 EXPOSE 80 0
-CONNECT -description="wordpress dashboard" WEB wordpress http://80/wp-admin/
+
+BACKGROUND mlab ready -p :80
+CONNECT -auto -description="wordpress dashboard" WEB wordpress http://80/wp-admin/
 
 #TODO
 #substr=\${inspect#*\"internal\": 80,*\"external\": }
