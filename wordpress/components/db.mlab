@@ -2,18 +2,15 @@
 
 FROM mariadb
 
-FLAG ip=default IP to be used for DB server
 FLAG name=mariadb database persistent folder
 
-NAME ${name}-db
-
-NETCON $ip
+NAME db
 
 EXPORT MYSQL_ROOT_PASSWORD=example
 
 EXPOSE 3306 3306
 
-SHARE /var/lib/mysql/ VOLUME:${name}_db
+SHARE /var/lib/mysql/ VOLUME:$name/${name}_db
 
 BACKGROUND mlab detach -p :3306 -t 30s
 

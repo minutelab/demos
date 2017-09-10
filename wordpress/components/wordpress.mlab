@@ -2,10 +2,10 @@
 
 FROM wordpress
 
-NAME ${name}-wp
+NAME wp
 
-FLAG dbhost Database host
 FLAG name=wpProj wordpress persistent folder
+FLAG url=127.0.0.1:8888 "url site (without the http://)"
 FLAG ext allocated port
 
 # install shell tools
@@ -26,7 +26,6 @@ INSERT -mode=0555 /bin/wp << "END"
 # remain correct
 sudo -u www-data /bin/wp-cli.phar "$@"
 END
-
 # end wp cli installation
 
 INSERT -mode=0555 /usr/local/bin/wpconfig  << "END_CONFIG"
@@ -36,28 +35,36 @@ INSERT -mode=0555 /usr/local/bin/wpconfig  << "END_CONFIG"
   grep -q -F 'WP_HOME' /var/www/html/wp-config.php || echo "define('WP_HOME', 'http://' . \$_SERVER['HTTP_HOST']);" >> /var/www/html/wp-config.php
 END_CONFIG
 
-EXPORT WORDPRESS_DB_HOST=$dbhost:3306
+EXPORT WORDPRESS_DB_HOST=db:3306
 EXPORT WORDPRESS_DB_PASSWORD=example
+
+#wp migratedb find-replace --find=127.0.0.1:\$prev --replace=127.0.0.1:$ext --skip-replace-guids
+#wp search-replace 127.0.0.1:\$prev 127.0.0.1:$ext --skip-columns=guid
 
 INSERT -mode=0555 /usr/local/bin/sqlupdate  << END_MYSQL
   #!/bin/bash
 
   #get previus port from the database
-  siteurl="\$(mysql -h 192.168.200.10 --user=root --password=example wordpress -e \"select option_value from wp_options where option_name='siteurl';\")"
+  siteurl="\$(mysql -h db --user=root --password=example wordpress -e \"select option_value from wp_options where option_name='siteurl';\")"
   if [ \$? -eq 1 ]
   then
     echo "DB is not initielized"
   else
+    wp plugin install "WP migrate DB"
+    wp plugin activate "wp-migrate-db"
     prev="\${siteurl#*127.0.0.1:}"
     echo prev:\$prev
     echo curr:$ext
-    wp search-replace 127.0.0.1:\$prev 127.0.0.1:$ext --skip-columns=guid
+    wp migratedb find-replace --find=127.0.0.1:\$prev --replace=$url --skip-replace-guids
+    wp plugin deactivate "wp-migrate-db"
+    wp plugin delete "wp-migrate-db"
   fi
 END_MYSQL
 
 EXPOSE 80 80
 
-SHARE /var/www/html/ VOLUME:${name}_wp
+SHARE /var/www/html/ VOLUME:$name/${name}_wp
+SHARE /import /wp-share
 
 BACKGROUND mlab detach -p :80 -t 30s
 

@@ -28,7 +28,7 @@ The WordPress setup includes the following tools, commonly required by wordpres 
 
 ### Creating a new project
 
-To create a new project, enter a new project name as the input parameter needed when running the WordPress setup. 
+To create a new project, enter a new project name as the input parameter needed when running the WordPress setup.
 The given project name will be used as a project identifier for the entire project lifecycle.
 
 The following steps are required to initiate a new project:
@@ -48,6 +48,50 @@ Follow these steps to reopen an existing project:
 * Run `main.mlab` with the desired project name as a parameter.
 * Wait as the setup initializes, until all 4 containers are active and the associated command prompt reports "Lab is ready....".
 * Continue working on the project via WordPress dashboard or any other tool.
+
+### Exporting an existing project
+
+The Export script exports DB tables as `.sql` file, after migrating the content according to a new URL given as a parameter.
+In addition to the `.sql` file, the export deliver the themes, plugins and uploads folders from the wp-content.
+All files are delivered to an output local folder.
+
+Follow these step to Export an existing project:
+
+* Run `export.mlab` with the required project name, new URL to assign and the output path on your local desktop as parameters.
+
+
+Export folder files structure:
+
+```
+<output folder>
+      - <export>.sql      (file)
+      - wp-content        (folder)
+            - plugins     (folder + content)
+            - themes      (folder + content)
+            - uploads     (folder + content)
+```
+
+### Cloning an existing project
+
+Cloning a project, creates an exact duplication of the project in a new name.
+Project cloning can be useful in creating backups or project templates.
+
+Follow these step to Clone an existing project:
+
+* Run `clone.mlab` with the originated project name and the new project name as parameters.
+
+### Importing an existing project
+
+The Import script imports DB tables from an `.sql` file, during DB import, it migrates the DB content according to its current URL.
+In addition to the `.sql` file, the import retrieve the themes, plugins and uploads folders.
+All files are imported from an input folder on the user desktop that is given as a parameter to the script.
+
+The Input folder files structure is identical to the export folder file structure.
+
+Follow these step to Import a new project:
+
+* Run `import.mlab` with new project name and Input folder as parameters.
+
 
 ## Setup description
 
@@ -76,14 +120,14 @@ This script initializes a WordPress server including a WP-CLI tool.
 
 **NAME**
 
-The WordPress container name is [project name]-wp.
+The WordPress container name is wp.[project name].
 
 **PARAMETERS**
 
 While activating the WordPress setup as a single unit (main.mlab), the main container controls the parameters.
 
-* Database host. The IP address of the setup database.
 * project name. The project name is used as a unique identifier.
+* URL. The URL of the WordPress project.
 * external allocated port.
 
 **ACTIONS**
@@ -98,13 +142,12 @@ The database is created with user: root, and password: example.
 
 **NAME**
 
-The database container name is [project name]-db.
+The database container name is db.[project name].
 
 **PARAMETERS**
 
 While activating the WordPress development environment as a single unit (main.mlab), the main container controls the parameters.
 
-* Database IP Address. The database's IP address.
 * project name. Used as the project unique identifier.
 
 **ACTIONS**
@@ -118,13 +161,12 @@ This script initializes a phpMyAdmin application server.
 
 **NAME**
 
-The phpMyAdmin container name is [project name]-pma.
+The phpMyAdmin container name is pma.[project name].
 
 **PARAMETERS**
 
 While activating the WordPress setup as single unit (main.mlab), the main container controls the parameters.
 
-* Database host. The IP address of the setup database.
 * project name. Used as the project unique identifier.
 
 **ACTIONS**

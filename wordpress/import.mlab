@@ -2,19 +2,25 @@
 
 FROM ubuntu
 
-FLAG name=myproj project name
+FLAG name=myproj new project name
+FLAG in=out "import from files in folder"
 
 NAME -domain $name
 
 ADD -dos2unix $spath/../wordpress/ /wp/
+ADD $in /tmp/import/
 
 SHARE /$name VOLUME:$name
+SET PROJECT=/$name
+
+# share folder between containers
 SHARE /wp-share
 
 # expose wordpress sub containers web port
 EXPOSE 80 0
 #BACKGROUND mlab ready -p :80
 CONNECT -description="wordpress dashboard" WEB wordpress http://80/wp-admin/
+
 
 #TODO
 #substr=\${inspect#*\"internal\": 80,*\"external\": }
@@ -23,6 +29,17 @@ CONNECT -description="wordpress dashboard" WEB wordpress http://80/wp-admin/
 START << END
   #!/bin/bash
   set -e
+
+  #check if project exist
+  if [ "\$(ls -A $PROJECT)" ]; then
+       echo "Fail to import project, project $name already exist"
+       exit 1
+  fi
+
+  # copy import data and scripts to shares folder
+  cd /tmp/import
+  tar cf - . |  tar -C /wp-share -xBf -
+  cp /wp/components/*.sh /wp-share
 
   #get current allocated port
   inspect=\$(mlab inspect)
@@ -36,8 +53,9 @@ START << END
   mlab run /wp/components/phpMyAdmin.mlab $DBADDR -name $name &
   mlab run /wp/components/wordpress.mlab $DBADDR -name $name -ext \$external -url 127.0.0.1:\$external
 
-  mlab exec  wp wpconfig
-  mlab exec  wp sqlupdate
+  mlab exec wp wpconfig
+  mlab exec wp /import/import-sql.sh -p\$external
+  mlab exec wp /import/import-wp.sh
 
   echo "Lab is ready...."
   bash

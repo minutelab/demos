@@ -1,0 +1,32 @@
+#!/usr/bin/env mlab
+
+FROM ubuntu
+
+FLAG from=myproj from project
+FLAG to=newproj to project
+
+SHARE /fromdb VOLUME:$from/${from}_db
+SHARE /todb VOLUME:$to/${to}_db
+SET DEST_DB=/todb
+
+SHARE /fromwp VOLUME:$from/${from}_wp
+SHARE /towp VOLUME:$to/${to}_wp
+SET DEST_WP=/towp
+
+START << END
+if [ "\$(ls -A $DEST_DB)" ]; then
+     echo "Fail to clone project, project $to already exist"
+     exit 1
+else
+    cd  /fromdb
+    tar cf - . |  tar -C /todb -xBf -
+fi
+
+if [ "\$(ls -A $DEST_WP)" ]; then
+     echo "Fail to clone project, project $to already exist"
+     exit 1
+else
+    cd /fromwp
+    tar cf - . |  tar -C /towp -xBf -
+fi
+END
