@@ -3,8 +3,11 @@
 FROM wordpress
 
 FLAG name=wpProj wordpress project to export
-FLAG URL= project new URL
+FLAG -bool migrate=false "Migrate DB during export"
+FLAG URL project new URL
 FLAG out=out "export folder"
+
+NAME -domain $name
 
 # install shell tools
 RUN apt-get update && apt-get install -y vim
@@ -44,6 +47,8 @@ START << END
   #!/bin/bash
   set -e
 
+  /wp/components/export-validate.sh -m$migrate -u "$URL"
+
   mlab run /wp/components/db.mlab -name $name
 
   # clone WordPress data
@@ -51,16 +56,22 @@ START << END
   tar cf - . |  tar -C /var/www/html -xBf -
   cd /var/www/html
 
-  siteurl="\$(mysql -h db --user=root --password=example wordpress -e \"select option_value from wp_options where option_name='siteurl';\")"
-  if [ \$? -eq 1 ]
+  siteurl="\$(mysql -h db --user=root --password=example wordpress -e \"select option_value from wp_options where option_name='siteurl';\")" || err=\$?
+  if [ \$err -eq 1 ]
   then
     echo "DB is not initielized"
-  else
+    exit 0
+  fi
+
+  if [ $migrate = true ]
+  then
     wp plugin install "WP migrate DB"
     wp plugin activate "wp-migrate-db"
     prev="\${siteurl#*127.0.0.1:}"
     echo prev:\$prev
     echo curr:$URL
     wp migratedb export export --find=127.0.0.1:\$prev --replace=$URL --skip-replace-guids
-    fi
+  else
+    wp db export export.sql
+  fi
 END

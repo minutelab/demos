@@ -22,7 +22,6 @@ siteurl="$(mysql -h db --user=root --password=example wordpress -e "select optio
 
 wp plugin install "WP migrate DB"
 wp plugin activate "wp-migrate-db"
-echo hhhhh:\$siteurl
 prev="${siteurl#*http://}"
 echo prev:$prev
 echo curr:127.0.0.1:$curr

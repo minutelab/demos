@@ -51,13 +51,15 @@ Follow these steps to reopen an existing project:
 
 ### Exporting an existing project
 
-The Export script exports DB tables as `.sql` file, after migrating the content according to a new URL given as a parameter.
-In addition to the `.sql` file, the export deliver the themes, plugins and uploads folders from the wp-content.
-All files are delivered to an output local folder.
+The Export script exports DB tables as `.sql` file and delivers the themes, plugins and uploads folders from the wp-content.
+
+In case the `migrate` parameter is on and a new `URL` parameter is given, the export will migrate the DB content accordingly.
+
+All files are delivered to an output local folder as specifyed in the `out` parameter.
 
 Follow these step to Export an existing project:
 
-* Run `export.mlab` with the required project name, new URL to assign and the output path on your local desktop as parameters.
+* Run `export.mlab` with the required project name, migrate flag, new URL to assign and the output path on your local desktop as parameters.
 
 
 Export folder files structure:
