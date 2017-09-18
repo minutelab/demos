@@ -14,4 +14,4 @@ SHARE /var/lib/mysql/ VOLUME:$name/${name}_db
 
 BACKGROUND mlab detach -p :3306 -t 30s
 
-CONNECT -description="mysql client - command line" CONSOLE mysql "mysql --user=root --password=example  wordpress"
+CONNECT -description="mysql command line client" CONSOLE mysql "mysql --user=root --password=example  wordpress"

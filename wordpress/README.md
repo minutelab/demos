@@ -23,6 +23,7 @@ The WordPress setup includes the following tools, commonly required by wordpres 
 * Database
 * phpMyAdmin
 * WP-CLI
+* phpInfo
 
 ## Working with a WordPress development environment
 
@@ -114,6 +115,7 @@ The main container name is the `project name` parameter.
 **ACTIONS**
 
 * wordpress - Opens the WordPress dashboard in a web browser window.
+* phpInfo - View PHP settings
 * shell - opens a bash command line window connected to the container.
 
 ### `wordpress.mlab` - a WordPress server.

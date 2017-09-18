@@ -33,6 +33,8 @@ INSERT -mode=0555 /usr/local/bin/wpconfig  << "END_CONFIG"
 
   grep -q -F 'WP_SITEURL' /var/www/html/wp-config.php || echo "define('WP_SITEURL', 'http://' . \$_SERVER['HTTP_HOST']);" >> /var/www/html/wp-config.php
   grep -q -F 'WP_HOME' /var/www/html/wp-config.php || echo "define('WP_HOME', 'http://' . \$_SERVER['HTTP_HOST']);" >> /var/www/html/wp-config.php
+
+  echo "<? phpinfo(); ?>" > /var/www/html/phpinfo.php
 END_CONFIG
 
 EXPORT WORDPRESS_DB_HOST=db:3306

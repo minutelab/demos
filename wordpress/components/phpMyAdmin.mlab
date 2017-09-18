@@ -14,4 +14,4 @@ EXPORT PMA_PASSWORD=example
 
 EXPOSE 80 0
 
-CONNECT -description="phpMyAdmin" WEB admin http://80
+CONNECT -description="phpMyAdmin dashboard" WEB admin http://80

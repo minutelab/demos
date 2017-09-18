@@ -20,7 +20,7 @@ SHARE /wp-share
 EXPOSE 80 0
 #BACKGROUND mlab ready -p :80
 CONNECT -description="wordpress dashboard" WEB wordpress http://80/wp-admin/
-
+CONNECT -description="View PHP Settings" WEB phpInfo http://80/phpinfo.php
 
 #TODO
 #substr=\${inspect#*\"internal\": 80,*\"external\": }
