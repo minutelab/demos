@@ -52,18 +52,18 @@ Follow these steps to reopen an existing project:
 
 ### Exporting an existing project
 
-The Export script exports DB tables as `.sql` file and delivers the themes, plugins and uploads folders from the wp-content.
+You can use this framework to export a WordPress project. this is useful to transfer the products of a project under development to testing or production. Use the Export script to export DB tables as `.sql` file and deliver the themes, plugins and upload folders from the wp-content.
 
-In case the `migrate` parameter is on and a new `URL` parameter is given, the export will migrate the DB content accordingly.
+In case the `migrate` parameter is turned on and a new `URL` parameter is given, the export script will migrate the DB content accordingly.
 
-All files are delivered to an output local folder as specifyed in the `out` parameter.
+All files are delivered to an output local folder as specified in the `out` parameter.
 
 Follow these step to Export an existing project:
 
 * Run `export.mlab` with the required project name, migrate flag, new URL to assign and the output path on your local desktop as parameters.
 
 
-Export folder files structure:
+The Export folder files structure:
 
 ```
 <output folder>
@@ -76,24 +76,24 @@ Export folder files structure:
 
 ### Cloning an existing project
 
-Cloning a project, creates an exact duplication of the project in a new name.
-Project cloning can be useful in creating backups or project templates.
+Cloning a project, creates an exact duplicate of a project with a new given name.
+Cloning a project can be useful to create backups or project templates.
 
 Follow these step to Clone an existing project:
 
-* Run `clone.mlab` with the originated project name and the new project name as parameters.
+* Run `clone.mlab` with the original project name and a new project name as parameters.
 
 ### Importing an existing project
 
-The Import script imports DB tables from an `.sql` file, during DB import, it migrates the DB content according to its current URL.
-In addition to the `.sql` file, the import retrieve the themes, plugins and uploads folders.
+You can import an existing project using the import script. The script imports DB tables from an `.sql` file, during DB import, it migrates the DB content based on its current URL.
+In addition to the `.sql` file, the import script retrieves the themes, plugins and uploads folders.
 All files are imported from an input folder on the user desktop that is given as a parameter to the script.
 
-The Input folder files structure is identical to the export folder file structure.
+The Input folder files structure should match the export folder file structure.
 
 Follow these step to Import a new project:
 
-* Run `import.mlab` with new project name and Input folder as parameters.
+* Run `import.mlab` with a new project name and Input folder as parameters.
 
 
 ## Setup description
