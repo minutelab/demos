@@ -52,7 +52,7 @@ Follow these steps to reopen an existing project:
 
 ### Exporting an existing project
 
-You can use this framework to export a WordPress project. this is useful to transfer the products of a project under development to testing or production. Use the Export script to export DB tables as `.sql` file and deliver the themes, plugins and upload folders from the wp-content.
+You can use this framework to export a WordPress project. this is useful to transfer the products of a project under development to testing or production. Use the Export script to export DB tables as `.sql` file and deliver the themes, plugins and uploads folders from the wp-content.
 
 In case the `migrate` parameter is turned on and a new `URL` parameter is given, the export script will migrate the DB content accordingly.
 
