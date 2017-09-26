@@ -2,8 +2,11 @@
 
 FROM ubuntu
 
-FLAG from=myproj from project
-FLAG to=newproj to project
+FLAG from=myproj "from project"
+FLAG to=newproj "to project"
+
+# just to enforce validatation of "to" name....
+NAME -domain $to
 
 SHARE /fromdb VOLUME:$from/${from}_db
 SHARE /todb VOLUME:$to/${to}_db

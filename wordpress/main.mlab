@@ -2,18 +2,22 @@
 
 FROM ubuntu
 
-FLAG name=myproj project name
+FLAG name=myproj "project name"
+FLAG phpver=5.6 "php version (5.6 / 7.0 / 7.1)"
 
 NAME -domain $name
 
 ADD -dos2unix $spath/../wordpress/ /wp/
 
+# setup persistent volume
 SHARE /$name VOLUME:$name
+
+# temporary data share between containers in the setup
 SHARE /wp-share
 
 # expose wordpress sub containers web port
 EXPOSE 80 0
-#BACKGROUND mlab ready -p :80
+BACKGROUND mlab ready -p :80
 CONNECT -description="wordpress dashboard" WEB wordpress http://80/wp-admin/
 CONNECT -description="View PHP Settings" WEB phpInfo http://80/phpinfo.php
 
@@ -35,10 +39,10 @@ START << END
 
   mlab run /wp/components/db.mlab -name $name
   mlab run /wp/components/phpMyAdmin.mlab $DBADDR -name $name &
-  mlab run /wp/components/wordpress.mlab $DBADDR -name $name -ext \$external -url 127.0.0.1:\$external
+  mlab run /wp/components/wordpress.mlab $DBADDR -name $name -ext \$external -phpver $phpver
 
-  mlab exec  wp wpconfig
-  mlab exec  wp sqlupdate
+  mlab exec wp wpconfig
+  mlab exec wp /wp/update-sql.sh -p127.0.0.1:\$external
 
   echo "Lab is ready...."
   bash

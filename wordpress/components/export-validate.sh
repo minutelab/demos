@@ -13,7 +13,7 @@ do
 	esac
 done
 
-if [ $migrate = true ]
+if [ "$migrate" = true ]
 then
   if [ -z "$URL" ]
   then

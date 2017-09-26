@@ -1,47 +1,28 @@
 #!/usr/bin/env mlab
 
-FROM wordpress
+FROM ubuntu
 
-FLAG name=wpProj wordpress project to export
+FLAG name=myproj "wordpress project to export"
 FLAG -bool migrate=false "Migrate DB during export"
-FLAG URL project new URL
+FLAG URL "project new URL"
 FLAG out=out "export folder"
 
 NAME -domain $name
 
-# install shell tools
-RUN apt-get update && apt-get install -y vim
-
-#install wp cli
-# Install requirements for wp-cli support
-RUN << "END"
-  apt-get install -y sudo less mysql-client
-  rm -rf /var/lib/apt/lists/*
-END
-
 ADD -dos2unix $spath/../wordpress/ /wp/
 
-# Add WP-CLI
-RUN curl -o /bin/wp-cli.phar https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
-RUN chmod +x /bin/wp-cli.phar
+# setup persistent volume
+SHARE /export VOLUME:$name
 
-INSERT -mode=0555 /bin/wp << "END"
-  #!/bin/sh
-  # This is a wrapper so that wp-cli can run as the www-data user so that permissions
-  # remain correct
-  sudo -u www-data /bin/wp-cli.phar "$@"
-END
-# end wp cli installation
+# temporary data share between containers in the setup
+SHARE /wp-share
 
-EXPORT WORDPRESS_DB_HOST=db:3306
-EXPORT WORDPRESS_DB_PASSWORD=example
+OUTPUT /wp-share/export.sql $out/
+OUTPUT /wp-share/wp-content/themes $out/wp-content/themes/
+OUTPUT /wp-share/wp-content/plugins $out/wp-content/plugins/
+OUTPUT /wp-share/wp-content/uploads $out/wp-content/uploads/
 
-SHARE /org_wp VOLUME:$name/${name}_wp
-
-OUTPUT /var/www/html/export.sql $out/
-OUTPUT /org_wp/wp-content/themes $out/wp-content/themes/
-OUTPUT /org_wp/wp-content/plugins $out/wp-content/plugins/
-OUTPUT /org_wp/wp-content/uploads $out/wp-content/uploads/
+BACKGROUND mlab ready -p :80
 
 START << END
   #!/bin/bash
@@ -52,26 +33,10 @@ START << END
   mlab run /wp/components/db.mlab -name $name
 
   # clone WordPress data
-  cd /org_wp
-  tar cf - . |  tar -C /var/www/html -xBf -
-  cd /var/www/html
+  cd /export/${name}_wp
+  tar cf - ./wp-content |  tar -C /wp-share -xBf -
 
-  siteurl="\$(mysql -h db --user=root --password=example wordpress -e \"select option_value from wp_options where option_name='siteurl';\")" || err=\$?
-  if [ \$err -eq 1 ]
-  then
-    echo "DB is not initielized"
-    exit 0
-  fi
+  mlab run /wp/components/wordpress.mlab $DBADDR -name $name
 
-  if [ $migrate = true ]
-  then
-    wp plugin install "WP migrate DB"
-    wp plugin activate "wp-migrate-db"
-    prev="\${siteurl#*127.0.0.1:}"
-    echo prev:\$prev
-    echo curr:$URL
-    wp migratedb export export --find=127.0.0.1:\$prev --replace=$URL --skip-replace-guids
-  else
-    wp db export export.sql
-  fi
+  mlab exec wp /wp/export-sql.sh -p$URL -m $migrate
 END

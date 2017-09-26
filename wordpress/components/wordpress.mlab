@@ -1,32 +1,20 @@
 #!/usr/bin/env mlab
+FLAG name=wpProj wordpress persistent folder
+FLAG ext allocated port
+FLAG phpver=5.6 "php version"
 
-FROM wordpress
+FROM wordpress:php${phpver}-apache
+#FROM wordpress
 
 NAME wp
-
-FLAG name=wpProj wordpress persistent folder
-FLAG url=127.0.0.1:8888 "url site (without the http://)"
-FLAG ext allocated port
 
 # install shell tools
 RUN apt-get update && apt-get install -y vim
 
+ADD -dos2unix $spath/*.sh /wp/
+
 #install wp cli
-# Install requirements for wp-cli support
-RUN apt-get install -y sudo less mysql-client \
-  && rm -rf /var/lib/apt/lists/*
-
-# Add WP-CLI
-RUN curl -o /bin/wp-cli.phar https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
-RUN chmod +x /bin/wp-cli.phar
-
-INSERT -mode=0555 /bin/wp << "END"
-#!/bin/sh
-# This is a wrapper so that wp-cli can run as the www-data user so that permissions
-# remain correct
-sudo -u www-data /bin/wp-cli.phar "$@"
-END
-# end wp cli installation
+RUN /wp/wp-cli.sh
 
 INSERT -mode=0555 /usr/local/bin/wpconfig  << "END_CONFIG"
   #!/bin/bash
@@ -40,33 +28,10 @@ END_CONFIG
 EXPORT WORDPRESS_DB_HOST=db:3306
 EXPORT WORDPRESS_DB_PASSWORD=example
 
-#wp migratedb find-replace --find=127.0.0.1:\$prev --replace=127.0.0.1:$ext --skip-replace-guids
-#wp search-replace 127.0.0.1:\$prev 127.0.0.1:$ext --skip-columns=guid
-
-INSERT -mode=0555 /usr/local/bin/sqlupdate  << END_MYSQL
-  #!/bin/bash
-
-  #get previus port from the database
-  siteurl="\$(mysql -h db --user=root --password=example wordpress -e \"select option_value from wp_options where option_name='siteurl';\")"
-  if [ \$? -eq 1 ]
-  then
-    echo "DB is not initielized"
-  else
-    wp plugin install "WP migrate DB"
-    wp plugin activate "wp-migrate-db"
-    prev="\${siteurl#*127.0.0.1:}"
-    echo prev:\$prev
-    echo curr:$ext
-    wp migratedb find-replace --find=127.0.0.1:\$prev --replace=$url --skip-replace-guids
-    wp plugin deactivate "wp-migrate-db"
-    wp plugin delete "wp-migrate-db"
-  fi
-END_MYSQL
-
 EXPOSE 80 80
 
 SHARE /var/www/html/ VOLUME:$name/${name}_wp
-SHARE /import /wp-share
+SHARE /wp-share /wp-share
 
 BACKGROUND mlab detach -p :80 -t 30s
 

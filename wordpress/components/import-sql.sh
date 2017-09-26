@@ -15,16 +15,6 @@ done
 shift $((OPTIND-1))
 
 # import db
-mysql -h db --user=root --password=example wordpress < /import/*.sql
+mysql -h db --user=root --password=example wordpress < /wp-share/*.sql
 
-# extruct siteurl
-siteurl="$(mysql -h db --user=root --password=example wordpress -e "select option_value from wp_options where option_name='siteurl';")"
-
-wp plugin install "WP migrate DB"
-wp plugin activate "wp-migrate-db"
-prev="${siteurl#*http://}"
-echo prev:$prev
-echo curr:127.0.0.1:$curr
-wp migratedb find-replace --find=$prev --replace=127.0.0.1:$curr --skip-replace-guids
-wp plugin deactivate "wp-migrate-db"
-wp plugin delete "wp-migrate-db"
+$(dirname "$0")/update-sql.sh -p$curr

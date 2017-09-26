@@ -34,7 +34,7 @@ The given project name will be used as a project identifier for the entire proje
 
 The following steps are required to initiate a new project:
 
-* Run `main.mlab` with a new project name as a parameter.
+* Run `main.mlab` with a new project name and php version (default 5.6) as parameters.
 * Wait as the setup initializes, until all four containers are active and the associated command prompt reports "Lab is ready....".
 * In the mlab desktop client, go to 'Setups' and hover over the main container, represented by the project name. On the right side, a 'terminate container' and a 'connect' buttons will appear. Click the connect button and select 'WordPress' from the menu. This will activate the `WordPress` action enabled by the main container.
 * Start to work with WordPress dashboard to create your new project.
@@ -93,7 +93,7 @@ The Input folder files structure should match the export folder file structure.
 
 Follow these step to Import a new project:
 
-* Run `import.mlab` with a new project name and Input folder as parameters.
+* Run `import.mlab` with a new project name an Input folder and php version (default 5.6) as parameters.
 
 
 ## Setup description
@@ -111,6 +111,7 @@ The main container name is the `project name` parameter.
 **PARAMETERS**
 
 * project name. The project name is used as a unique identifier of a project. (default: myproj)
+* php version. The php version that will be used for the project. default is 5.6, version options: 5.6, 7.0, 7.1.
 
 **ACTIONS**
 
@@ -131,7 +132,7 @@ The WordPress container name is wp.[project name].
 While activating the WordPress setup as a single unit (main.mlab), the main container controls the parameters.
 
 * project name. The project name is used as a unique identifier.
-* URL. The URL of the WordPress project.
+* php version. The php version that will be used for the project.
 * external allocated port.
 
 **ACTIONS**
