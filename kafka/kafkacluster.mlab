@@ -10,8 +10,6 @@ FLAG datadir "directory for data (for all members)"
 
 NAME -domain $name
 
-SHARE /data $datadir
-
 ADD $spath/kafkanode.mlab /usr/local/bin
 
 RUN echo 0 > /last
@@ -34,6 +32,8 @@ INSERT -mode=0555 /usr/local/bin/start_broker << END
 END
 
 CONNECT CONSOLE add_broker start_broker
+
+SHARE /data $datadir
 
 START << END
   if [ -z "$zookeeper" ]

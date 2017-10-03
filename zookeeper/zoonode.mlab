@@ -9,9 +9,6 @@ FROM zookeeper:$version
 
 NAME node-$id
 
-SHARE /data $datadir/data
-SHARE /datalog $datadir/datalog
-
 INSERT -mode=0755 /wait.sh << "END"
 #!/bin/bash
 
@@ -30,6 +27,9 @@ done
 END
 
 CONNECT CONSOLE zkCLI zkCli.sh
+
+SHARE /data $datadir/data
+SHARE /datalog $datadir/datalog
 
 START << END
   echo "starting node $id"

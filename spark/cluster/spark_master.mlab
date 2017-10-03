@@ -15,12 +15,12 @@ EXPOSE 8080
 EXPOSE 6066
 EXPOSE 50070
 
-BACKGROUND mlab detach  -p :7077 -t 120s -e 10
-
 RUN apt-get update &&  apt-get install -y vim
 
 ADD $spath/conf/*.xml /tmp/conf/
 RUN mv /tmp/conf/*.xml $HADOOP_CONF_DIR/
+
+BACKGROUND mlab detach  -p :7077 -t 120s -e 10
 
 SHARE /opt/hdfs $datadir
 

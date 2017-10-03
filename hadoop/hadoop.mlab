@@ -19,8 +19,6 @@ NETCON $ip
 
 NAME $name
 
-SHARE /mnt/hdfs $datadir
-
 SET MIRROR=http://apache.claz.org/hadoop/common/
 
 # install ssh daemon (for hdfs), and make sure that root has it in its known keys
@@ -77,5 +75,7 @@ EXPOSE 50070 $hdfsweb
 EXPOSE  8088 $yarnweb
 
 ADD $spath/start.sh /usr/local/bin
+
+SHARE /mnt/hdfs $datadir
 
 START start.sh -n "$name" -s "$slaves"

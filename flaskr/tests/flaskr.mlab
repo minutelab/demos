@@ -12,8 +12,6 @@ RUN apt-get install -y python3-psycopg2
 
 RUN pip3 install flask
 
-SHARE /src $spath/../src
-
 EXPOSE 5000 5000
 
 WORKDIR /src
@@ -25,6 +23,8 @@ END_CONFIG
 EXPORT FLASKR_SETTINGS=/tmp/flaskr.cfg
 
 OPTION tty
+
+SHARE /src $spath/../src
 
 START << END
   set -e

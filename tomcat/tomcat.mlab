@@ -14,10 +14,6 @@ EXPOSE 8080 $port
 
 RUN sed -i -e 's/<Context>/<Context reloadable="true">/' /usr/local/tomcat/conf/context.xml
 
-# We share the whole source and use symbolic links to the app directory,
-# becauase if we mount directly the app directory, mvn clean delete it
-# in a way that future installs don't recreate it
-SHARE /src $spath
 RUN ln -s /src/target/app /usr/local/tomcat/webapps/hellowar
 
 EXPOSE 5005 $debugport
@@ -25,6 +21,11 @@ EXPOSE 5005 $debugport
 BACKGROUND mlab ready -p :8080
 
 CONNECT -auto WEB web http://8080/hellowar
+
+# We share the whole source and use symbolic links to the app directory,
+# becauase if we mount directly the app directory, mvn clean delete it
+# in a way that future installs don't recreate it
+SHARE /src $spath
 
 START << END
    export JAVA_OPTS='-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005'
